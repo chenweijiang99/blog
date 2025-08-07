@@ -101,7 +101,7 @@
           <div v-else class="qrcode-box">
             <div class="qrcode-wrapper">
               <div class="qrcode-scanner"></div>
-              <img :src="qrCodeUrl" alt="二维码" class="qrcode-img" />
+              <img src="/src/assets/qrcode.jpg" alt="二维码" class="qrcode-img" />
               <transition name="fade">
                 <div class="qrcode-mask" v-if="qrCodeExpired">
                   <el-icon class="expired-icon"><Warning /></el-icon>
@@ -208,8 +208,8 @@ const showSliderVerify = ref(false);
 const sliderVerifyRef = ref();
 
 const loginForm = reactive({
-  username: "admin",
-  password: "123456",
+  username: "",
+  password: "",
   rememberMe: false,
   source: "ADMIN",
   nonceStr: "",
@@ -219,11 +219,11 @@ const loginForm = reactive({
 const rules = {
   username: [
     { required: true, message: "请输入用户名", trigger: "blur" },
-    { min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur" },
+    // { min: 3, max: 20, message: "长度在 3 到 50 个字符", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
-    { min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "blur" },
+    // { min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "blur" },
   ],
 };
 
