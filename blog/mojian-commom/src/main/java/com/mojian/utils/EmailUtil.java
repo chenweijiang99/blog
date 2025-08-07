@@ -77,7 +77,7 @@ public class EmailUtil {
                 "          <tbody>\n" +
                 "            <tr style=\"background-color: #f8f8f8;\">\n" +
                 "              <td>\n" +
-                "                <img style=\"padding: 15px 0 15px 30px;width:50px\" src=\"http://117.72.179.87:85/localFile/20250806/default/78_favicon.jpg\" />" +
+                "                <img style=\"padding: 15px 0 15px 30px;width:50px\" src=\"http://117.72.179.87:85/localFile/logo.jpg\" />" +
                 "                <span>韋博客 </span>\n" +
                 "              </td>\n" +
                 "            </tr>\n" +

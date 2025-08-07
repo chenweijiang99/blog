@@ -32,7 +32,7 @@
           <span class="nav-text">群聊</span>
         </div>
       </div>
-      <div class="nav-bottom">
+      <!-- <div class="nav-bottom">
         <a
           class="nav-item"
           href="https://gitee.com/quequnlong/shiyi-blog"
@@ -42,7 +42,7 @@
           <i class="fab fa-github"></i>
           <span class="nav-text">源码</span>
         </a>
-      </div>
+      </div> -->
     </div>
 
     <!-- 遮罩层 -->
@@ -390,22 +390,22 @@ export default {
         },
       ],
       friendsList: [
-        {
-          id: 1,
-          name: "张三",
-          avatar:
-            "https://foruda.gitee.com/avatar/1677004143848886034/2106773_hhf1237_1647845148.png",
-          signature: "热爱生活，热爱编程。",
-          gender: "男",
-        },
-        {
-          id: 2,
-          name: "李四",
-          avatar:
-            "https://foruda.gitee.com/avatar/1677079463351115261/7467101_unique_perfect_1638710768.png",
-          signature: "旅行是我的灵魂。",
-          gender: "女",
-        },
+        // {
+        //   id: 1,
+        //   name: "张三",
+        //   avatar:
+        //     "https://foruda.gitee.com/avatar/1677004143848886034/2106773_hhf1237_1647845148.png",
+        //   signature: "热爱生活，热爱编程。",
+        //   gender: "男",
+        // },
+        // {
+        //   id: 2,
+        //   name: "李四",
+        //   avatar:
+        //     "https://foruda.gitee.com/avatar/1677079463351115261/7467101_unique_perfect_1638710768.png",
+        //   signature: "旅行是我的灵魂。",
+        //   gender: "女",
+        // },
       ],
       messageText: "",
       ws: null, // WebSocket实例

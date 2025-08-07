@@ -41,13 +41,13 @@ knife4j:
 
 #==============================公众号配置==============================
 wechat:
-  app-id:
+  app-id: wx66610ae6a45de497
   # 公众号AppSecret
-  secret:
+  secret: 9631b5c8d542556f5bc542328618015c
   # 公众号Token
-  token:
+  token: cwj
   # 公众号AES Key
-  aesKey:
+  aesKey: EsolspotIfizscSLU7NqnlYIwcYoYmzZALRMv65DcBr
 
   appletAppId:
   appletSecret:

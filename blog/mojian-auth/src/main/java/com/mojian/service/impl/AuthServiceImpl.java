@@ -265,7 +265,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (response.getData() == null) {
             log.info("用户取消了 {} 第三方登录",source);
-            httpServletResponse.sendRedirect("https://www.shiyit.com");
+            httpServletResponse.sendRedirect("http://117.72.179.87:85/");
             return;
         }
         String result = com.alibaba.fastjson.JSONObject.toJSONString(response.getData());
@@ -297,7 +297,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         StpUtil.login(user.getId());
-        httpServletResponse.sendRedirect("https://www.shiyit.com/?token=" + StpUtil.getTokenValue());
+        httpServletResponse.sendRedirect("http://117.72.179.87:85/?token=" + StpUtil.getTokenValue());
     }
 
     @Override

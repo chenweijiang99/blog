@@ -32,11 +32,14 @@
           <div class="qrcode-content">
             <div class="qrcode-box">
               <!-- 这里放二维码图片 -->
-              <img
+              <!-- <img
                 v-lazy="'https://img.shiyit.com/qrcode.jpg'"
                 :key="'https://img.shiyit.com/qrcode.jpg'"
                 alt="微信二维码"
-              />
+              /> -->
+              <img
+               src="/src/assets/qrcode.jpg"
+               />
             </div>
             <p class="qrcode-tip">
               登录验证码：
@@ -281,7 +284,7 @@ export default {
   },
   data() {
     return {
-      currentForm: "account",
+      currentForm: "login",
       loading: false,
       wechatForm: {
         code: "",

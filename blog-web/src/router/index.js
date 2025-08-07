@@ -20,7 +20,7 @@ const routes = [
         path: "/",
         component: Layout,
         meta: {
-            title: "拾壹博客-一个专注于技术分享的博客平台",
+            title: "韋",
             loading: true
         },
         children: [
