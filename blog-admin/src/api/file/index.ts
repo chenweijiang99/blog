@@ -17,7 +17,8 @@ export function uploadApi(data: any, source: string) {
     method: 'post',
     headers: { "Content-Type": "multipart/articles-data" },
     data,
-    params: { source: source }
+    params: { source: source },
+    timeout: 0
   })
 }
 

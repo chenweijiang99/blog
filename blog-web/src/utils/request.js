@@ -5,7 +5,7 @@ import router from '@/router'
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
-  timeout: 10000
+  timeout: 300000
 })
 
 // 请求拦截器

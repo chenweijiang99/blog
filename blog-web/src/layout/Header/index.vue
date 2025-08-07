@@ -187,34 +187,27 @@ export default {
         //   icon: 'fas fa-users',
         //   colorClass: 'friend-link'
         // },
-        { 
-          name: '关于本站', 
-          path: '/about', 
-          icon: 'fas fa-info-circle',
-          colorClass: 'about-link',
-          children: [
-            { 
-              name: '关于我', 
-              path: '/about', 
-              icon: 'fas fa-user',
-              colorClass: 'about-me-link'
-            },
-            // { 
-            //   name: '网站源码', 
-            //   path: 'https://gitee.com/quequnlong', 
-            //   icon: 'fab fa-github',
-            //   colorClass: 'github-link',
-            //   external: true 
-            // },
-            { 
-              name: '后台管理', 
-              path: import.meta.env.VITE_APP_ADMIN_URL || 'http://localhost:3000',
-              icon: 'fas fa-tv',
-              colorClass: 'admin-link',
-              external: true 
-            }
-          ]
-        }
+        // { 
+        //   name: '关于本站', 
+        //   path: '/about', 
+        //   icon: 'fas fa-info-circle',
+        //   colorClass: 'about-link',
+        //   children: [
+        //     { 
+        //       name: '关于我', 
+        //       path: '/about', 
+        //       icon: 'fas fa-user',
+        //       colorClass: 'about-me-link'
+        //     },
+        //     { 
+        //       name: '后台管理', 
+        //       path: import.meta.env.VITE_APP_ADMIN_URL || 'http://localhost:3000',
+        //       icon: 'fas fa-tv',
+        //       colorClass: 'admin-link',
+        //       external: true 
+        //     }
+        //   ]
+        // }
       ],
       activeDropdown: null,
       showDropdown: false,
