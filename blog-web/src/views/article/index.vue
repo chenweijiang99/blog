@@ -430,7 +430,7 @@ export default {
      * 获取加载中的图片
      */
     getLoadingImage() {
-      return 'https://img.shiyit.com/base/mojian/lazy.gif'
+      return new URL('../assets/images/loading.gif', import.meta.url).href
     },
     /**
      * 生成目录
@@ -655,7 +655,7 @@ export default {
                 img.classList.add('loaded')
               }
               tempImg.onerror = () => {
-                img.src = 'https://img.shiyit.com/base/mojian/img-error.jpg'
+                img.src = new URL('/src/assets/img-error.jpg')
                 img.classList.add('error')
               }
               tempImg.src = actualSrc

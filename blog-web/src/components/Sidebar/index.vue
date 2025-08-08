@@ -8,9 +8,9 @@
         <div class="author-avatar">
           <el-avatar class="avatar" :src="$store.state.webSiteInfo.authorAvatar" alt="作者头像" />
         </div>
-        <div class="status-badge">
+        <!-- <div class="status-badge">
           <span>在线</span>
-        </div>
+        </div> -->
       </div>
       <div class="author-info">
         <h3>{{ $store.state.webSiteInfo.author }}</h3>
@@ -207,7 +207,7 @@ export default {
       left: 0;
       right: 0;
       height: 120px;
-      background-image: url('https://img.shiyit.com/beijing.jpg');
+      background-image: url('/src/assets/beijing.jpg');
       background-size: cover;
       background-position: center;
       transition: opacity 0.3s ease;
