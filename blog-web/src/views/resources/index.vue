@@ -128,7 +128,7 @@
         <!-- 验证码部分 -->
         <div class="verify-section" v-if="showVerifyCode">
           <div class="qr-code">
-            <img v-lazy="'https://img.shiyit.com/qrcode.jpg'" :key="'https://img.shiyit.com/qrcode.jpg'"  alt="扫码获取验证码">
+            <img src="/src/assets/qrcode.jpg"  alt="扫码获取验证码">
             <p class="scan-tip">请使用微信扫码关注公众号发送 <span class="code-tip">验证码</span> 获取验证码</p>
           </div>
           <el-form :model="verifyForm" class="verify-form">

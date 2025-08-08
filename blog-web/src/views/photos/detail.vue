@@ -1,7 +1,7 @@
 <template>
   <div class="album-detail">
     <div v-if="isAuthenticated">
-      <div class="album-header">
+      <div class="album-header" >
         <div class="header-content">
           <div class="back-button" @click="$router.back()">
             <i class="fas fa-arrow-left"></i>
@@ -20,7 +20,7 @@
             </div>
             <h1>{{ album.name }}</h1>
             <p class="album-description">{{ album.description }}</p>
-            <div class="album-actions">
+            <!-- <div class="album-actions">
               <button class="action-btn share-btn">
                 <i class="fas fa-share-alt"></i>
                 分享相册
@@ -29,7 +29,7 @@
                 <i class="fas fa-download"></i>
                 下载全部
               </button>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="header-background">
@@ -184,7 +184,7 @@ export default {
   overflow: hidden;
   display: flex;
   align-items: center;
-  
+
   .header-background {
     position: absolute;
     inset: 0;
