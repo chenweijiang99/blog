@@ -62,9 +62,9 @@
                             文章分类
                         </h3>
                         <el-form-item prop="categoryId">
-                            <el-select v-model="articleForm.categoryId" placeholder="请选择分类">
+                            <el-select v-model="articleForm.categoryName" placeholder="请选择分类">
                                 <el-option v-for="item in categories" :key="item.id" :label="item.name"
-                                    :value="item.id">
+                                    :value="item.name">
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -76,9 +76,9 @@
                             文章标签
                         </h3>
                         <el-form-item prop="tagIds">
-                            <el-select v-model="articleForm.tagIds" multiple filterable allow-create default-first-option
+                            <el-select v-model="articleForm.tags" multiple filterable allow-create default-first-option
                                 placeholder="请选择标签">
-                                <el-option v-for="item in tags" :key="item.id" :label="item.name" :value="item.id">
+                                <el-option v-for="item in tags" :key="item.id" :label="item.name" :value="item.name">
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -144,8 +144,8 @@ export default {
                 keywords: '',
                 isOriginal: 1,
                 originalUrl: '',
-                categoryId: '',
-                tagIds: [],
+                categoryName: '',
+                tags: [],
                 status: ''
             },
             rules: {
@@ -191,10 +191,10 @@ export default {
                 cover: [
                     { required: true, message: '请上传封面图片', trigger: 'change' }
                 ],
-                categoryId: [
+                categoryName: [
                     { required: true, message: '请选择文章分类', trigger: 'change' }
                 ],
-                tagIds: [
+                tags: [
                     { required: true, message: '请选择文章标签', trigger: 'change' },
                     { 
                         validator: (rule, value, callback) => {
@@ -270,6 +270,7 @@ export default {
                 }
             })
             this.articleForm.status = status[0].value
+            
             await this.submitArticle()
         },
         /**
@@ -281,6 +282,7 @@ export default {
                 if (!valid) return
                 this.isSubmitting = true
                 this.articleForm.content = this.$refs.mdRef.d_render;
+                console.log(this.articleForm)
                 const api = this.articleForm.id ? updateArticleApi : createArticleApi
                 api(this.articleForm).then(res => {
                     this.$message.success('保存成功')
