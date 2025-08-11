@@ -5,6 +5,9 @@
         <div class="user-avatar">
           <img :src="$store.state.userInfo?.avatar" />
         </div>
+
+
+  
       </div>
       <div class="nav-menu">
         <div
@@ -109,7 +112,7 @@
           <h3>{{ currentChat.name }}</h3>
         </div>
       </div>
-
+      
       <div class="messages chat-messages" ref="messageContainer">
         <!-- 添加加载更多按钮 -->
         <div v-if="hasMore" class="load-more-wrapper">
@@ -448,6 +451,8 @@ export default {
       isMobile: false,
       isListHidden: false,
       selectedFriend: null, // 用于存储选中的好友信息
+      onlineCount: 0,
+      onlineUsers: [],
       isVoiceMode: false, // 新增语音模式状态
       mediaRecorder: null,
       audioChunks: [],

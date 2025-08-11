@@ -19,7 +19,7 @@ import java.util.Objects;
  * @date: 2025/3/4
  * @description: 敏感词过滤工具类（需要在resource下放置敏感词文件）
  */
-@Component
+//@Component
 public class SensitiveUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SensitiveUtil.class);

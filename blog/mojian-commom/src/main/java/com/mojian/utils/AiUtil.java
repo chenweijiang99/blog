@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,8 +32,8 @@ public class AiUtil {
     private ArkService service = null;
 
     //这里可以初始化AI的角色
-//    public final List<ChatMessage> messages = new ArrayList<>(Collections.singletonList(ChatMessage.builder()
-//            .role(ChatMessageRole.SYSTEM).content("你是豆包，是由字节跳动开发的 AI 人工智能助手").build()));
+    public final List<ChatMessage> messages = new ArrayList<>(Collections.singletonList(ChatMessage.builder()
+            .role(ChatMessageRole.SYSTEM).content("你是小韦，是一个AI助手，可以帮助用户生成文本，代码等").build()));
 
 
     private void initService(){
@@ -50,7 +51,7 @@ public class AiUtil {
     public String send(String content) {
         initService();
         // 初始化消息列表
-        List<ChatMessage> messages = new ArrayList<>();
+//        List<ChatMessage> messages = new ArrayList<>();
         // 创建用户消息
         ChatMessage userMessage = ChatMessage.builder()
                 .role(ChatMessageRole.USER) // 设置消息角色为用户
