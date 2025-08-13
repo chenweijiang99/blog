@@ -36,21 +36,21 @@ public class SysResourceController {
     }
 
     @PostMapping("/add")
-    @SaCheckPermission("sys:resource:add")
+//    @SaCheckPermission("sys:resource:add")
     @ApiOperation(value = "添加资源表")
     public Result<Object> add(@RequestBody SysResource sysResource) {
         return Result.success(sysResourceService.insert(sysResource));
     }
 
     @PutMapping("/update")
-    @SaCheckPermission("sys:resource:update")
+//    @SaCheckPermission("sys:resource:update")
     @ApiOperation(value = "修改资源表")
     public Result<Object> edit(@RequestBody SysResource sysResource) {
         return Result.success(sysResourceService.update(sysResource));
     }
 
     @DeleteMapping("/delete/{ids}")
-    @SaCheckPermission("sys:resource:delete")
+//    @SaCheckPermission("sys:resource:delete")
     @ApiOperation(value = "删除资源表")
     public Result<Object> remove(@PathVariable List<Long> ids) {
         return Result.success(sysResourceService.deleteByIds(ids));

@@ -15,6 +15,11 @@ public interface SysResourceService extends IService<SysResource> {
     IPage<SysResource> selectPage(SysResource sysResource);
 
     /**
+     * 查询资源表列表
+     */
+    List<SysResource> selectList(SysResource sysResource);
+
+    /**
      * 新增资源表
      */
     boolean insert(SysResource sysResource);

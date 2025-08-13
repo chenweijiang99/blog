@@ -80,3 +80,14 @@ export function getDictDataByDictTypesApi(dictTypes : any) {
     method: 'get'
   })
 } 
+
+
+/**
+ * 获取字典数据
+ */
+export function getDictDataApi(dictType: any) {
+  return request({
+    url: `/sys/dictData/selectDataByDictTypeCache/${dictType}`,
+    method: 'get'
+  })
+}

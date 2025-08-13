@@ -3,6 +3,7 @@ package com.mojian.service.impl;
 import java.util.List;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.mojian.enums.ResourceStatusEnum;
 import org.springframework.stereotype.Service;
 import com.mojian.mapper.SysResourceMapper;
 import com.mojian.entity.SysResource;
@@ -36,10 +37,31 @@ public class SysResourceServiceImpl extends ServiceImpl<SysResourceMapper, SysRe
         wrapper.eq(sysResource.getPayType() != null, SysResource::getPayType, sysResource.getPayType());
         wrapper.eq(sysResource.getPanPath() != null, SysResource::getPanPath, sysResource.getPanPath());
         wrapper.eq(sysResource.getPanCode() != null, SysResource::getPanCode, sysResource.getPanCode());
+        wrapper.eq(sysResource.getStatus() != null, SysResource::getStatus, sysResource.getStatus());
         wrapper.eq(sysResource.getCreateTime() != null, SysResource::getCreateTime, sysResource.getCreateTime());
         return page(PageUtil.getPage(), wrapper);
     }
 
+    /**
+     * 查询资源表列表
+     */
+    @Override
+    public List<SysResource> selectList(SysResource sysResource) {
+        LambdaQueryWrapper<SysResource> wrapper = new LambdaQueryWrapper<>();
+        // 构建查询条件
+        wrapper.eq(sysResource.getId() != null, SysResource::getId, sysResource.getId());
+        wrapper.eq(sysResource.getUserId() != null, SysResource::getUserId, sysResource.getUserId());
+        wrapper.eq(sysResource.getName() != null, SysResource::getName, sysResource.getName());
+        wrapper.eq(sysResource.getCategory() != null, SysResource::getCategory, sysResource.getCategory());
+        wrapper.eq(sysResource.getDownloads() != null, SysResource::getDownloads, sysResource.getDownloads());
+        wrapper.eq(sysResource.getIsFree() != null, SysResource::getIsFree, sysResource.getIsFree());
+        wrapper.eq(sysResource.getPayType() != null, SysResource::getPayType, sysResource.getPayType());
+        wrapper.eq(sysResource.getPanPath() != null, SysResource::getPanPath, sysResource.getPanPath());
+        wrapper.eq(sysResource.getPanCode() != null, SysResource::getPanCode, sysResource.getPanCode());
+        wrapper.eq(sysResource.getStatus() != null, SysResource::getStatus, sysResource.getStatus());
+        wrapper.eq(sysResource.getCreateTime() != null, SysResource::getCreateTime, sysResource.getCreateTime());
+        return list(wrapper);
+    }
 
     /**
      * 新增资源表
