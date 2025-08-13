@@ -1,8 +1,10 @@
 package com.mojian.controller.article;
 
+import java.util.Date;
 import java.util.List;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +42,11 @@ public class SysMomentController {
     @SaCheckPermission("sys:moment:update")
     @ApiOperation(value = "修改说说")
     public Result<Object> edit(@RequestBody SysMoment sysMoment) {
-        return Result.success(sysMomentService.updateById(sysMoment));
+        UpdateWrapper<SysMoment> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", sysMoment.getId());
+        updateWrapper.set("content", sysMoment.getContent());
+        updateWrapper.set("images", sysMoment.getImages() != null && !sysMoment.getImages().isEmpty() ? sysMoment.getImages() : null);
+        return Result.success(sysMomentService.update(updateWrapper));
     }
 
     @DeleteMapping("/delete/{ids}")

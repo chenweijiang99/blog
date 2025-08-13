@@ -17,9 +17,12 @@
       <el-table v-loading="loading" :data="momentList" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="内容" align="center" prop="content" show-overflow-tooltip />
-        <el-table-column label="图片" align="center" prop="content">
+        <el-table-column label="图片" align="center" prop="images">
           <template #default="scope">
-            <el-image v-for="item in parseImage(scope.row.images)" :src="item" style="width: 50px; height: 50px" />
+            <div v-if="scope.row.images !== '' && scope.row.images !== null">
+              <el-image v-for="item in parseImage(scope.row.images)" :key="item" :src="item"
+                style="width: 50px; height: 50px" />
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" width="180" />
@@ -47,14 +50,16 @@
       class="custom-dialog">
       <el-form ref="momentFormRef" :model="momentForm" :rules="rules" label-width="80px" class="custom-form">
         <el-form-item label="内容" prop="content">
-            <div style="border: 1px solid #ccc;">
-                <Toolbar style="border-bottom: 1px solid #ccc;" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
-                <Editor style=" overflow-y: hidden;min-height: 300px;" v-model="momentForm.content" :defaultConfig="editorConfig" :mode="mode"
-                @onCreated="handleCreated"/>
-            </div>
+          <div style="border: 1px solid #ccc;">
+            <Toolbar style="border-bottom: 1px solid #ccc;" :editor="editorRef" :defaultConfig="toolbarConfig"
+              :mode="mode" />
+            <Editor style=" overflow-y: hidden;min-height: 300px;" v-model="momentForm.content"
+              :defaultConfig="editorConfig" :mode="mode" @onCreated="handleCreated" />
+          </div>
         </el-form-item>
         <el-form-item label="图片" prop="images">
-          <UploadImage v-model="momentForm.images" :source="'moment'" :limit="9" :multiple="true" />
+            <UploadImage v-model="momentForm.images" :source="'moment'" :limit="9" :multiple="true" />
+          
         </el-form-item>
       </el-form>
 
@@ -209,11 +214,16 @@ const handleUpdate = (row: any) => {
   dialog.title = '修改说说'
   dialog.visible = true
   Object.assign(momentForm, row)
-  momentForm.images = momentForm.images.split(',')
+  // 正确处理 images 字段，如果为空则设为空数组
+  if (momentForm.images && momentForm.images !== '') {
+    momentForm.images = momentForm.images.split(',')
+  } else {
+    momentForm.images = []
+  }
 }
 
 // 富文本编辑器创建完成
-const handleCreated = (editor:any) => {
+const handleCreated = (editor: any) => {
   editorRef.value = editor // 记录 editor 实例，重要！
 }
 
@@ -225,9 +235,14 @@ const submitForm = async () => {
     if (valid) {
       submitLoading.value = true
       try {
-        if (momentForm.images && momentForm.images.length > 0) { 
+        // 处理 images 字段
+        if (!momentForm.images || 
+            (Array.isArray(momentForm.images) && momentForm.images.length === 0)) {
+          momentForm.images = null
+        } else if (Array.isArray(momentForm.images) && momentForm.images.length > 0) {
           momentForm.images = momentForm.images.join(',')
         }
+        
         if (dialog.type === 'add') {
           await addSysMomentApi(momentForm)
           ElMessage.success('新增成功')

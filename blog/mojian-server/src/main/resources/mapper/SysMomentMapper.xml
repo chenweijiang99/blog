@@ -14,4 +14,15 @@
         left join sys_user u on m.user_id = u.id
         order by m.create_time desc
     </select>
+    <select id="selectMyMoments" resultType="com.mojian.entity.SysMoment">
+        select
+            *
+        from sys_moment m
+        where m.user_id = #{userId}
+        <if test="keywords != null and keywords != ''">
+            and m.content like concat('%',#{keywords},'%')
+        </if>
+        order by m.create_time desc
+
+    </select>
 </mapper>

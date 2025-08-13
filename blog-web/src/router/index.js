@@ -176,6 +176,17 @@ const routes = [
                 }
               },
               {
+                path: '/moment/editor',
+                name: 'momentEditor',
+                component: () => import(/* webpackPrefetch: true */ '@/views/moments/editor.vue'),
+                meta: {
+                  title: '写说说',
+                  icon: 'fas fa-edit',
+                  requireAuth: true,
+                  hidden: true
+                }
+              },
+              {
                 path: '/chat',
                 name: 'Chat',
                 component: () => import(/* webpackPrefetch: true */ '@/views/chat/index.vue'),

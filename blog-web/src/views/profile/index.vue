@@ -132,6 +132,66 @@
 
       </div>
 
+      <!-- 我的说说 -->
+      <div v-if="currentTab === 'moments'" class="content-section">
+        <h2 class="section-title">我的说说</h2>
+        <div class="action-bar">
+          <div>
+        <el-input 
+          v-model="momentsParams.keywords" 
+          size="mini" 
+          placeholder="输入说说内容搜索..." 
+          prefix-icon="el-icon-search"
+          style="width: 300px; margin-right: 10px"
+          @keyup.enter.native="handleMomentSearch"
+        ></el-input>
+        <el-button type="primary" size="mini" icon="el-icon-search" @click="handleMomentSearch">搜索</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-refresh" @click="resetMomentSearch">重置</el-button>
+      </div>
+          <el-button type="primary" icon="el-icon-plus" size="mini" @click="$router.push('/moment/editor')">发布说说</el-button>
+        </div>
+
+        <div v-loading="loading" v-if="moments.length">
+          <el-card v-for="moment in moments" :key="moment.id" class="moment-item">
+            <div class="moment-content">
+              <div class="moment-text" v-html="parseContent(moment.content)"></div>
+              <div class="moment-images" v-if="moment.images && moment.images.length">
+                <el-image 
+                  v-for="(image, index) in parseImage(moment.images)" 
+                  :key="index"
+                  :src="image" 
+                  class="moment-image"
+                  :preview-src-list="parseImage(moment.images)"
+                  fit="cover">
+                </el-image>
+              </div>
+              <div class="moment-meta">
+                <el-tag size="small"><i class="el-icon-date"></i> {{ moment.createTime }}</el-tag>
+        
+              </div>
+            </div>
+            <div class="moment-actions">
+              <!-- <el-button type="text" icon="el-icon-view" @click="viewMoment(moment.id)">查看</el-button> -->
+              <el-button type="text" icon="el-icon-edit" @click="editMoment(moment.id)">编辑</el-button>
+              <el-button type="text" icon="el-icon-delete" class="delete" @click="deleteMoment(moment.id)">删除</el-button>
+            </div>
+          </el-card>
+
+          <div class="pagination-box">
+            <el-pagination 
+              background 
+              @current-change="handleMomentPageChange" 
+              :current-page="momentsParams.pageNum"
+              :page-size="momentsParams.pageSize" 
+              :total="total" 
+              layout="prev, pager, next" 
+              class="pagination">
+            </el-pagination>
+          </div>
+        </div>
+        <el-empty v-else description="暂无说说，快去发布你的第一条说说吧~~"></el-empty>
+      </div>
+
       <!-- 我的文章 -->
       <div v-if="currentTab === 'posts'" class="content-section">
         <h2 class="section-title">我的文章</h2>
@@ -140,6 +200,7 @@
             <el-input v-model="params.title" size="mini" placeholder="输入文字标题搜索文章..." prefix-icon="el-icon-search"
               style="width: 300px;margin-right: 10px"></el-input>
             <el-button type="primary" size="mini" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+            <el-button type="primary" size="mini" icon="el-icon-refresh" @click="resethandleSearch">重置</el-button>
           </div>
 
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="$router.push('/editor')">写文章</el-button>
@@ -382,6 +443,7 @@ import {
 import { getMyArticleApi, likeArticleApi, delArticleApi } from '@/api/article'
 import { getDictDataApi } from '@/api/dict'
 import AvatarCropper from '@/components/common/AvatarCropper.vue'
+import { getMyMomentsApi, deleteMyMomentApi } from '@/api/moments' // 添加说说相关API
 
 import { marked } from "marked";
 export default {
@@ -420,6 +482,7 @@ export default {
       tabs: [
         { key: 'profile', label: '个人资料', icon: 'fas fa-user' },
         { key: 'binding', label: '账号绑定', icon: 'fas fa-link' },
+        { key: 'moments', label: '我的说说', icon: 'fas fa-comment' }, // 添加我的说说菜单项
         { key: 'posts', label: '我的文章', icon: 'fas fa-file-alt' },
         { key: 'comments', label: '我的评论', icon: 'fas fa-comments' },
         { key: 'replies', label: '我的回复', icon: 'fas fa-reply' },
@@ -457,6 +520,7 @@ export default {
       myComments: [],
       myReplies: [],
       myLikes: [],
+      moments: [], // 添加说说数据
       passwordRules: {
         oldPassword: [
           { required: true, message: '请输入当前密码', trigger: 'blur' },
@@ -490,8 +554,13 @@ export default {
       },
       params: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
         title: '',
+      },
+      momentsParams: {
+        pageNum: 1,
+        pageSize: 5,
+        keywords: ''
       },
       total: 0,
       loading: false,
@@ -556,6 +625,10 @@ export default {
         case 'feedback':
           this.params.pageNum = 1
           this.getMyFeedbacks()
+          break
+        case 'moments': // 添加说说模块
+          this.params.pageNum = 1
+          this.getMyMoments()
           break
         default:
           break
@@ -664,6 +737,11 @@ export default {
      */
     handleSearch() {
       this.params.pageNum = 1
+      this.getMyArticle()
+    },
+    resethandleSearch(){
+      this.params.pageNum = 1
+      this.params.title = ''
       this.getMyArticle()
     },
     /**
@@ -906,6 +984,81 @@ export default {
      */
     handleAvatarUpdate(newAvatarUrl) {
       this.userInfo.avatar = newAvatarUrl;
+    },
+    
+    // ==================== 说说相关方法 ====================
+    /**
+     * 获取我的说说
+     */
+    getMyMoments() {
+      this.loading = true
+      getMyMomentsApi(this.momentsParams).then(res => {
+        this.moments = res.data.records
+        this.total = res.data.total
+      }).finally(() => {
+        this.loading = false
+      })
+    },
+    
+    /**
+     * 编辑说说
+     */
+    editMoment(id) {
+      this.$router.push(`/moment/editor?id=${id}`)
+    },
+    
+    /**
+     * 查看说说详情
+     */
+    viewMoment(id) {
+      this.$message.info('说说详情页面待实现')
+    },
+    
+    /**
+     * 删除说说
+     */
+    deleteMoment(id) {
+      this.$confirm('确定要删除这条说说吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await deleteMyMomentApi(id)
+          this.$message.success('删除成功')
+          this.getMyMoments()
+        } catch (error) {
+          this.$message.error(error.message || '删除失败')
+        }
+      }).catch(() => {})
+    },
+    
+    /**
+     * 说说分页
+     */
+    handleMomentPageChange(val) {
+      this.momentsParams.pageNum = val
+      this.getMyMoments()
+    },
+    
+    /**
+     * 解析图片URL
+     */
+    parseImage(images) {
+      if (!images) return []
+      return images.split(',')
+    },
+    /**
+     * 说说搜索
+     */
+    handleMomentSearch() {
+      this.momentsParams.pageNum = 1
+      this.getMyMoments()
+    },
+    resetMomentSearch(){
+      this.momentsParams.pageNum = 1
+      this.momentsParams.keywords = ''
+      this.getMyMoments()
     },
   }
 }
@@ -1159,7 +1312,54 @@ export default {
   }
 }
 
+// 添加说说相关样式
+.moment-item {
+  margin-bottom: 16px;
 
+  .moment-content {
+    margin-bottom: 16px;
+  }
+
+  .moment-text {
+    color: var(--text-primary);
+    margin: 0 0 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+
+  .moment-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .moment-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+  }
+
+  .moment-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .el-tag {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+
+  .moment-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+  }
+}
 
 .action-bar {
   display: flex;
@@ -1479,4 +1679,14 @@ export default {
     }
   }
 }
+
+@media (max-width: 768px) {
+  .action-bar .el-input {
+    width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 10px;
+  }
+}
+
+
 </style>
