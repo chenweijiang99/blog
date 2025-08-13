@@ -19,13 +19,12 @@
       <div class="social-links">
         <div v-for="item in socialLinksWithData" :key="item.type">
           <el-tooltip placement="top" :content="item.content">
-            <a v-if="$store.state.webSiteInfo.showList.indexOf(item.type) !== -1" href="javascript:void(0)"
-                :title="item.title" :class="`social-btn ${item.type}`" @click="copyToClipboard(item)">
-                <i :class="item.icon"></i>
-            </a>
+            <button v-if="$store.state.webSiteInfo.showList.indexOf(item.type) !== -1" :title="item.title"
+              :class="`social-btn ${item.type}`" @click="copyToClipboard(item)">
+              <i :class="item.icon"></i>
+            </button>
           </el-tooltip>
         </div>
-
       </div>
     </el-card>
 
@@ -149,7 +148,7 @@ export default {
       if (val && val.right) {
         this.announcements = val.right
       }
-    } 
+    }
   },
   mounted() {
     getRecommendArticlesApi().then(res => {
@@ -169,15 +168,44 @@ export default {
       e.target.classList.add('fallback')
     },
     /**
-     * 复制到剪贴板
-     */
+  * 复制到剪贴板
+  */
     copyToClipboard(item) {
       if (item.icCopy) {
-        navigator.clipboard.writeText(item.link).then(() => {
-          this.$message.success(`${item.title}账号已复制到剪贴板`);
-        }).catch(() => {
-          this.$message.error('复制失败，请手动复制');
-        });
+        // 检查是否支持 navigator.clipboard
+        if (navigator.clipboard && window.isSecureContext) {
+          // 使用现代剪贴板 API
+          navigator.clipboard.writeText(item.link).then(() => {
+            this.$message.success(`${item.title}账号已复制到剪贴板`);
+          }).catch(() => {
+            this.$message.error('复制失败，请手动复制');
+          });
+        } else {
+          // 降级方案：使用 document.execCommand('copy')
+          const textArea = document.createElement('textarea');
+          textArea.value = item.link;
+
+          // 关键：设置样式防止影响页面布局
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-9999px';
+          textArea.style.top = '-9999px';
+          textArea.style.opacity = '0';
+          textArea.style.pointerEvents = 'none';
+
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+              this.$message.success(`${item.title}账号已复制到剪贴板`);
+            } else {
+              this.$message.error('复制失败，请手动复制');
+            }
+          } catch (err) {
+            this.$message.error('复制失败，请手动复制');
+          }
+          document.body.removeChild(textArea);
+        }
       } else {
         window.open(item.link, '_blank')
       }
@@ -312,6 +340,10 @@ export default {
         transition: all 0.3s ease;
         position: relative;
         text-decoration: none;
+        border: none;
+        /* 添加这一行 */
+        cursor: pointer;
+        /* 添加这一行 */
       }
 
       .qq {
