@@ -66,5 +66,14 @@ export function movePhotoApi(data: { photoIds: number[], albumId: number }) {
     })
 }
 
+// 添加批量添加照片的 API 接口
+export const addBatchPhotoApi = (data: any[]) => {
+  return request({
+    url: '/sys/photo/addBatch',
+    method: 'post',
+    data: data
+  })
+}
+
 
 

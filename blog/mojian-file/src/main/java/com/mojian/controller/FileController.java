@@ -20,6 +20,7 @@ import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -92,6 +93,28 @@ public class FileController {
         }
         return Result.success(fileInfo.getUrl());
     }
+    @SaCheckLogin
+    @PostMapping("/uploadBatch")
+    @ApiOperation(value = "批量上传文件")
+    public Result<List<String>> uploadBatch(MultipartFile[] files, String source) {
+        String path = DateUtil.parseDateToStr(DateUtil.YYYYMMDD, DateUtil.getNowDate()) + "/";
+        if (StringUtils.isNotBlank(source)) {
+            path = path + source + "/";
+        }
+        List<String> urls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            FileInfo fileInfo = fileStorageService.of(file)
+                    .setPath(path)
+                    .setSaveFilename(RandomUtil.randomNumbers(2) + "_" + file.getOriginalFilename()) //随机俩个数字，避免相同文件名时文件名冲突
+                    .putAttr("source", source)
+                    .upload();
+            urls.add(fileInfo.getUrl());
+        }
+        return Result.success(urls);
+    }
+
+
+
 
     @GetMapping("/delete")
     @ApiOperation(value = "删除文件")

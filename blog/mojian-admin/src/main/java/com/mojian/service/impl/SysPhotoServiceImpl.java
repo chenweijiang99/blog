@@ -84,4 +84,9 @@ public class SysPhotoServiceImpl extends ServiceImpl<SysPhotoMapper, SysPhoto> i
         baseMapper.move(ids, albumId);
         return Boolean.TRUE;
     }
+
+    @Override
+    public Object insertBatch(List<SysPhoto> sysPhotoList) {
+        return saveBatch(sysPhotoList);
+    }
 }

@@ -35,6 +35,7 @@ public class TaskQuartz {
     /**
      * 定时同步阅读量
      */
+
     public void syncQuantity() {
         // 获取带阅读量的前缀key集合
         List<SysArticle> articles = new ArrayList<>();

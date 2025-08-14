@@ -42,6 +42,12 @@ public class SysPhotoController {
         return Result.success(sysPhotoService.insert(sysPhoto));
     }
 
+    @PostMapping("/addBatch")
+    @SaCheckPermission("sys:photo:add")
+    @ApiOperation(value = "批量添加照片")
+    public Result<Object> addBatch(@RequestBody List<SysPhoto> sysPhotoList) {
+        return Result.success(sysPhotoService.insertBatch(sysPhotoList));
+    }
     @PutMapping("/update")
     @SaCheckPermission("sys:photo:update")
     @ApiOperation(value = "修改照片")

@@ -2,7 +2,7 @@
   <div class="article-list-component" v-loading="loading">
     <transition-group name="post-list" tag="div" class="posts-list">
       <article v-for="post in articles" :key="post.id" class="post-item">
-        <div class="post-content">
+        <div class="post-content" @click="$emit('article-click', post.id)">
           <div class="post-main">
             <div class="post-text">
               <h3>

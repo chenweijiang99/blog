@@ -41,4 +41,6 @@ public interface SysPhotoService extends IService<SysPhoto> {
      * @return
      */
     Object move(List<Long> ids, Long albumId);
+
+    Object insertBatch(List<SysPhoto> sysPhotoList);
 }

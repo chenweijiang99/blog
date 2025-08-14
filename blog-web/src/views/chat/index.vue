@@ -7,30 +7,18 @@
         </div>
 
 
-  
+
       </div>
       <div class="nav-menu">
-        <div
-          class="nav-item chat-icon"
-          :class="{ active: currentNav === 'chat' }"
-          @click="switchNav('chat')"
-        >
+        <div class="nav-item chat-icon" :class="{ active: currentNav === 'chat' }" @click="switchNav('chat')">
           <i class="fas fa-comment"></i>
           <span class="nav-text">聊天</span>
         </div>
-        <div
-          class="nav-item friends-icon"
-          :class="{ active: currentNav === 'friends' }"
-          @click="switchNav('friends')"
-        >
+        <div class="nav-item friends-icon" :class="{ active: currentNav === 'friends' }" @click="switchNav('friends')">
           <i class="fas fa-user-friends"></i>
           <span class="nav-text">好友</span>
         </div>
-        <div
-          class="nav-item groups-icon"
-          :class="{ active: currentNav === 'groups' }"
-          @click="switchNav('groups')"
-        >
+        <div class="nav-item groups-icon" :class="{ active: currentNav === 'groups' }" @click="switchNav('groups')">
           <i class="fas fa-users"></i>
           <span class="nav-text">群聊</span>
         </div>
@@ -49,27 +37,16 @@
     </div>
 
     <!-- 遮罩层 -->
-    <div
-      v-if="isMobile && !isListHidden"
-      class="mobile-overlay"
-      @click="toggleList"
-    ></div>
+    <!-- <div v-if="isMobile && !isListHidden" class="mobile-overlay" @click="toggleList"></div> -->
 
-    <div
-      class="chat-list-container"
-      :class="{ 'mobile-hidden': isMobile && isListHidden }"
-    >
+    <div class="chat-list-container" :class="{ 'mobile-hidden': isMobile && isListHidden }">
       <div class="search-box">
         <input type="text" placeholder="搜索" />
       </div>
       <div class="chat-list">
         <template v-if="currentNav === 'chat'">
-          <div
-            v-for="chat in chatList"
-            :key="chat.id"
-            class="chat-item"
-            :class="{ active: currentChat.id === chat.id }"
-          >
+          <div v-for="chat in chatList" :key="chat.id" class="chat-item"
+            :class="{ active: currentChat.id === chat.id }">
             <div class="avatar">
               <img :src="chat.avatar" />
             </div>
@@ -83,22 +60,43 @@
           </div>
         </template>
         <template v-else-if="currentNav === 'friends'">
-          <div
-            v-for="friend in friendsList"
-            :key="friend.id"
-            class="friend-item"
-            :class="{
-              active: selectedFriend && selectedFriend.id === friend.id,
-            }"
-            @click="selectFriend(friend)"
-          >
+          <div class="friends-header">
+            <h3>好友列表</h3>
+            <button class="add-friend-btn" @click="showAddFriendDialog">
+              <i class="fas fa-user-plus"></i>
+            </button>
+          </div>
+          <div v-for="friend in filteredFriendsList" :key="friend.id" class="friend-item" :class="{
+            active: selectedFriend && selectedFriend.id === friend.id,
+          }" @click="selectFriend(friend)">
             <div class="avatar">
               <img :src="friend.avatar" />
             </div>
             <div class="friend-info">
               <div class="name">{{ friend.name }}</div>
+              <div class="friend-status" :class="{ online: friend.online }">
+                {{ friend.online ? '在线' : '离线' }}
+              </div>
             </div>
           </div>
+          <el-dialog title="添加好友" :visible.sync="addFriendDialogVisible" width="400px"
+            :before-close="handleCloseAddFriendDialog">
+            <el-form :model="addFriendForm" ref="addFriendForm" label-width="80px">
+              <el-form-item label="用户ID" prop="userId"
+                :rules="[{ required: true, message: '请输入用户ID', trigger: 'blur' }]">
+                <el-input v-model="addFriendForm.userId" placeholder="请输入要添加的用户ID"></el-input>
+              </el-form-item>
+              <el-form-item label="申请消息" prop="message">
+                <el-input type="textarea" v-model="addFriendForm.message" placeholder="请输入申请消息" :rows="3">
+                </el-input>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="handleCloseAddFriendDialog">取 消</el-button>
+              <el-button type="primary" @click="sendFriendRequest">发送申请</el-button>
+            </span>
+          </el-dialog>
+
         </template>
       </div>
     </div>
@@ -112,7 +110,7 @@
           <h3>{{ currentChat.name }}</h3>
         </div>
       </div>
-      
+
       <div class="messages chat-messages" ref="messageContainer">
         <!-- 添加加载更多按钮 -->
         <div v-if="hasMore" class="load-more-wrapper">
@@ -122,94 +120,64 @@
           </button>
         </div>
 
-        <div
-          v-for="(msg, index) in currentChat.messages"
-          :key="generateUniqueKey(msg, index)"
-          :class="[
-            'message',
-            { 'message-self': msg.userId === $store.state.userInfo?.id },
-            { 'active-message': msg.id === currentChat.id }
-          ]"
-        >
-     
-          <div
-            class="avatar"
-            @contextmenu.prevent="handleAvatarContextMenu(msg, $event)"
-          >
+        <div v-for="(msg, index) in currentChat.messages" :key="generateUniqueKey(msg, index)" :class="[
+          'message',
+          { 'message-self': msg.userId === $store.state.userInfo?.id },
+          { 'active-message': msg.id === currentChat.id }
+        ]">
+
+          <div class="avatar" @contextmenu.prevent="handleAvatarContextMenu(msg, $event)">
             <img :src="msg.avatar" />
           </div>
           <div class="message-content">
             <div class="message-header">
-              <div
-                v-if="
-                  currentChat.isGroup && msg.userId !== $store.state.userInfo?.id
-                "
-                class="sender-name"
-              >
-                <span :class="msg.userId === 1 ? 'user-name': msg.userId === 2 ? 'assistant-name': ''" >{{ msg.name }}</span>
+              <div v-if="
+                currentChat.isGroup && msg.userId !== $store.state.userInfo?.id
+              " class="sender-name">
+                <span :class="msg.userId === 1 ? 'user-name' : msg.userId === 2 ? 'assistant-name' : ''">{{ msg.name
+                  }}</span>
                 <span v-if="msg.userId === 1" class="author-tag">作者</span>
                 <span v-if="msg.userId === 2" class="assistant-tag">A I</span>
                 <span class="message-time">{{ msg.time }}</span>
                 <span class="location">{{ splitIpAddress(msg.location) }}</span>
-                <span class="gender" v-if="msg.sex"><i :class="msg.sex === 1 ? 'fas fa-mars' : 'fas fa-venus'"></i></span>
+                <span class="gender" v-if="msg.sex"><i
+                    :class="msg.sex === 1 ? 'fas fa-mars' : 'fas fa-venus'"></i></span>
               </div>
             </div>
             <div v-if="msg.isRecalled" class="message-recalled">
               <span>消息已撤回</span>
             </div>
             <template v-else>
-              <div
-                :data-message-id="msg.id"
-                v-if="msg.type === 'text'"
-                class="message-text"
-                v-html="formatMessageContent(msg.content)"
-                @contextmenu.prevent="showMessageActions(msg, $event)"
-              ></div>
-              
-              <img
-                v-else-if="msg.type === 'image'"
-                v-lazy="msg.content"
-                :key="'img-' + (msg.id || index)"
-                class="message-image"
-                @click="previewImage(msg.content)"
-                @load="handleImageLoad"
-                @contextmenu.prevent="showMessageActions(msg, $event)"
-              />
-              <div
-                v-else-if="msg.type === 'file'"
-                class="message-file"
-                @contextmenu.prevent="showMessageActions(msg, $event)"
-              >
+              <div :data-message-id="msg.id" v-if="msg.type === 'text'" class="message-text"
+                v-html="formatMessageContent(msg.content)" @contextmenu.prevent="showMessageActions(msg, $event)"></div>
+
+              <img v-else-if="msg.type === 'image'" v-lazy="msg.content" :key="'img-' + (msg.id || index)"
+                class="message-image" @click="previewImage(msg.content)" @load="handleImageLoad"
+                @contextmenu.prevent="showMessageActions(msg, $event)" />
+              <div v-else-if="msg.type === 'file'" class="message-file"
+                @contextmenu.prevent="showMessageActions(msg, $event)">
                 <i class="fas fa-file-download"></i>
                 <div class="file-info">
-                  <a href="javascript:void(0)" >{{
+                  <a href="javascript:void(0)">{{
                     msg.fileName
-                  }}</a>
+                    }}</a>
                   <span class="file-size">{{
                     formatFileSize(msg.fileSize)
-                  }}</span>
+                    }}</span>
                 </div>
               </div>
-              <div
-                v-else-if="msg.type === 'audio'"
-                class="message-audio"
-                @contextmenu.prevent="showMessageActions(msg, $event)"
-              >
-                <div
-                  class="audio-bubble"
-                  @click="toggleAudioPlayback(msg, $event)"
-                >
-                  <i
-                    :class="['fas', msg.isPlaying ? 'fa-pause' : 'fa-play']"
-                  ></i>
+              <div v-else-if="msg.type === 'audio'" class="message-audio"
+                @contextmenu.prevent="showMessageActions(msg, $event)">
+                <div class="audio-bubble" @click="toggleAudioPlayback(msg, $event)">
+                  <i :class="['fas', msg.isPlaying ? 'fa-pause' : 'fa-play']"></i>
                   <span>{{ msg.duration }}秒</span>
                 </div>
               </div>
             </template>
-             <!-- 新增引用消息显示 -->
-             <div v-if="msg.replyId && !msg.isRecalled" class="reply-message" @click="scrollToMessage(msg.replyId)">
+            <!-- 新增引用消息显示 -->
+            <div v-if="msg.replyId && !msg.isRecalled" class="reply-message" @click="scrollToMessage(msg.replyId)">
               <span class="reply-content">
-                <i class="el-icon-top"></i>{{msg.replyUserName}}：{{msg.replyContent}}
+                <i class="el-icon-top"></i>{{ msg.replyUserName }}：{{ msg.replyContent }}
               </span>
             </div>
           </div>
@@ -226,26 +194,13 @@
           <mj-emoji size="1.1rem" class="emoji-picker" @select="insertEmoji" />
 
           <!-- 新增文件上传按钮 -->
-          <label
-            class="toolbar-btn file-upload-btn"
-            for="file-upload"
-            title="上传文件"
-          >
+          <label class="toolbar-btn file-upload-btn" for="file-upload" title="上传文件">
             <i class="fas fa-folder"></i>
           </label>
-          <input
-            id="file-upload"
-            type="file"
-            style="display: none"
-            @change="handleFileUpload"
-          />
+          <input id="file-upload" type="file" style="display: none" @change="handleFileUpload" />
 
           <!-- 新增语音录制按钮 -->
-          <label
-            @click="toggleVoiceMode"
-            class="toolbar-btn voice-toggle-btn"
-            title="语音输入"
-          >
+          <label @click="toggleVoiceMode" class="toolbar-btn voice-toggle-btn" title="语音输入">
             <i class="fas fa-microphone"></i>
           </label>
         </div>
@@ -253,14 +208,9 @@
         <div class="input-area">
           <template v-if="isVoiceMode">
             <!-- 改进的语音录制按钮 -->
-            <button
-              :class="['voice-record-btn', { recording: isRecording }]"
-              @mousedown="startRecording"
-              @mouseup="stopRecording"
-              @mouseleave="cancelRecording"
-              @touchstart="startRecording"
-              @touchend="stopRecording"
-            >
+            <button :class="['voice-record-btn', { recording: isRecording }]" @mousedown="startRecording"
+              @mouseup="stopRecording" @mouseleave="cancelRecording" @touchstart="startRecording"
+              @touchend="stopRecording">
               {{ isRecording ? "正在说话中..." : "按住说话" }}
             </button>
           </template>
@@ -268,28 +218,18 @@
             <div class="input-wrapper">
               <div class="paste-preview" v-if="pastedImages.length > 0">
                 <div v-for="(image, index) in pastedImages" :key="index" class="pasted-image">
-                  <img :src="image.preview"  @click="previewImage(image.preview)" />
+                  <img :src="image.preview" @click="previewImage(image.preview)" />
                   <i class="fas fa-times" @click="removeImage(index)"></i>
                 </div>
               </div>
-              <div
-                ref="messageInput"
-                class="message-input"
-                contenteditable="true"
-                @input="handleInput"
-                @keydown.enter.prevent="handleEnterKey"
-                @keydown="handleMentionKeydown"
-                @paste="handlePaste"
-                :placeholder="`输入消息...`"
-              ></div>
+              <div ref="messageInput" class="message-input" contenteditable="true" @input="handleInput"
+                @keydown.enter.prevent="handleEnterKey" @keydown="handleMentionKeydown" @paste="handlePaste"
+                :placeholder="`输入消息...`"></div>
             </div>
           </template>
 
-          <button
-            v-if="!isVoiceMode"
-            @click="sendMessage"
-            :disabled="(!messageText.trim() && pastedImages.length === 0) || countdown > 0"
-          >
+          <button v-if="!isVoiceMode" @click="sendMessage"
+            :disabled="(!messageText.trim() && pastedImages.length === 0) || countdown > 0">
             <template v-if="countdown > 0"> {{ countdown }}s </template>
             <i v-else class="fas fa-paper-plane"></i>
           </button>
@@ -300,34 +240,22 @@
     <!-- 图片预览 -->
     <mj-image-preview ref="imagePreview" />
 
-    <div
-      v-if="showActionsMenu"
-      class="message-actions-menu"
-      :style="actionMenuPosition"
-    >
+    <div v-if="showActionsMenu" class="message-actions-menu" :style="actionMenuPosition">
       <template v-if="selectedMessage">
         <!-- 新增回复选项 -->
-        <div class="action-item" v-if="selectedMessage.userId !== $store.state.userInfo?.id 
+        <div class="action-item" v-if="selectedMessage.userId !== $store.state.userInfo?.id
           && selectedMessage.isRecalled === false" @click="replyToMessage">
           <i class="fas fa-reply"></i>
           回复
         </div>
-        <div
-          v-if="selectedMessage.userId !== $store.state.userInfo?.id"
-          class="action-item"
-          @click="mentionUser"
-        >
+        <div v-if="selectedMessage.userId !== $store.state.userInfo?.id" class="action-item" @click="mentionUser">
           <i class="fas fa-at"></i>
           TA
         </div>
-        <div
-          v-if="
-            !selectedMessage.isRecalled &&
-            selectedMessage.userId === $store.state.userInfo?.id
-          "
-          class="action-item"
-          @click="recallMessage"
-        >
+        <div v-if="
+          !selectedMessage.isRecalled &&
+          selectedMessage.userId === $store.state.userInfo?.id
+        " class="action-item" @click="recallMessage">
           <i class="fas fa-undo"></i>
           撤回
         </div>
@@ -349,20 +277,8 @@
         签名：{{ selectedFriend.signature || "这个人很懒，什么都没写。" }}
       </p>
       <p class="gender">性别：{{ selectedFriend.gender || "未知" }}</p>
-      <el-button
-        type="primary"
-        size="small"
-        icon="el-icon-message"
-        @click="sendMessageToFriend"
-        >发送信息</el-button
-      >
-      <el-button
-        type="danger"
-        size="small"
-        icon="el-icon-delete"
-        @click="deleteFriend"
-        >删除好友</el-button
-      >
+      <el-button type="primary" size="small" icon="el-icon-message" @click="sendMessageToFriend">发送信息</el-button>
+      <el-button type="danger" size="small" icon="el-icon-delete" @click="deleteFriend">删除好友</el-button>
     </div>
   </div>
 </template>
@@ -393,23 +309,13 @@ export default {
         },
       ],
       friendsList: [
-        // {
-        //   id: 1,
-        //   name: "张三",
-        //   avatar:
-        //     "https://foruda.gitee.com/avatar/1677004143848886034/2106773_hhf1237_1647845148.png",
-        //   signature: "热爱生活，热爱编程。",
-        //   gender: "男",
-        // },
-        // {
-        //   id: 2,
-        //   name: "李四",
-        //   avatar:
-        //     "https://foruda.gitee.com/avatar/1677079463351115261/7467101_unique_perfect_1638710768.png",
-        //   signature: "旅行是我的灵魂。",
-        //   gender: "女",
-        // },
+      
       ],
+      addFriendDialogVisible: false,
+      addFriendForm: {
+        userId: '',
+        message: ''
+      },
       messageText: "",
       ws: null, // WebSocket实例
       currentChat: {
@@ -424,7 +330,7 @@ export default {
             id: 1,
             type: "",
             content: "",
-            isPlaying: false, 
+            isPlaying: false,
           },
         ],
       },
@@ -488,12 +394,12 @@ export default {
       return;
     }
     this.init();
-    
+
     // 在nextTick后禁用滚动,确保DOM已经渲染
     this.$nextTick(() => {
       disableScroll();
     });
-    
+
     this.checkMobile();
     window.addEventListener("resize", this.checkMobile);
   },
@@ -515,19 +421,35 @@ export default {
     enableScroll();
     window.removeEventListener("resize", this.checkMobile);
   },
+  // 添加计算属性用于过滤好友列表
+  computed: {
+    // 如果你有搜索功能，可以添加过滤逻辑
+    // filteredFriendsList() {
+    //   if (!this.searchText) {
+    //     return this.friendsList;
+    //   }
+    //   return this.friendsList.filter(friend => 
+    //     friend.name.toLowerCase().includes(this.searchText.toLowerCase())
+    //   );
+    // }
+  },
   methods: {
+    // 切换导航
     switchNav(nav) {
       this.currentNav = nav;
       this.selectedFriend = null;
-      if (nav === "chat") {
+
+      if (nav === 'friends') {
+        // 切换到好友列表时加载好友数据
+        this.loadFriendsList();
+      } else if (nav === "chat") {
+        // 原有聊天逻辑
         this.$nextTick(() => {
           this.scrollToBottom();
-          // 重新添加滚动事件监听器
           const container = this.$refs.messageContainer;
           if (container) {
             container.addEventListener("scroll", this.handleScroll);
           }
-          // 重置加载状态
           this.hasMore = true;
           this.params.pageNum = 1;
         });
@@ -563,17 +485,17 @@ export default {
         this.currentChat.lastTime = formatTime(
           this.currentChat.messages[0].time
         );
-        if(this.currentChat.messages[0].isRecalled){
+        if (this.currentChat.messages[0].isRecalled) {
           this.currentChat.lastMessage = "消息已撤回";
-        }else{
+        } else {
           this.currentChat.lastMessage =
             this.currentChat.messages[0].type === "text"
-            ? this.currentChat.messages[0].content
-            : this.currentChat.messages[0].type === "image"
-            ? "[图片]"
-            : this.currentChat.messages[0].type === "audio"
-            ? "[语音] " + this.currentChat.messages[0].duration + "秒"
-            : "[文件]";
+              ? this.currentChat.messages[0].content
+              : this.currentChat.messages[0].type === "image"
+                ? "[图片]"
+                : this.currentChat.messages[0].type === "audio"
+                  ? "[语音] " + this.currentChat.messages[0].duration + "秒"
+                  : "[文件]";
         }
       }
       //获取到的数据是最新时间的，应该要把这个顺序反过来
@@ -673,7 +595,7 @@ export default {
         fileName: message.fileName,
         duration: message.duration,
         isPlaying: false, // 确保初始化时存在
-        replyId: message.replyId || null, 
+        replyId: message.replyId || null,
         replyContent: message.replyContent || null,
         replyUserName: message.replyUserName || null,
       };
@@ -683,10 +605,10 @@ export default {
         message.type === "text"
           ? message.content
           : message.type === "image"
-          ? "[图片]"
-          : message.type === "audio"
-          ? "[语音] " + message.duration + "秒"
-          : "[文件]";
+            ? "[图片]"
+            : message.type === "audio"
+              ? "[语音] " + message.duration + "秒"
+              : "[文件]";
       this.currentChat.lastTime = "刚刚";
       this.shouldScrollToBottom = true;
 
@@ -700,7 +622,7 @@ export default {
     /**
      * 处理代码块
      */
-    async handlePreCode(){
+    async handlePreCode() {
       await this.$nextTick()
       document.querySelectorAll('pre code').forEach((block) => {
         hljs.highlightBlock(block)
@@ -709,10 +631,10 @@ export default {
       this.addCopyButtons();
     },
 
-     /**
-     * 添加复制按钮
-     */
-     addCopyButtons() {
+    /**
+    * 添加复制按钮
+    */
+    addCopyButtons() {
       const codeBlocks = document.querySelectorAll('.message-content pre')
       if (!codeBlocks.length) return
 
@@ -757,9 +679,9 @@ export default {
      * 发送文本消息
      */
     async sendMessage() {
-      if ((!this.messageText.trim() && this.pastedImages.length === 0) || 
-          !this.$store.state.userInfo || 
-          this.countdown > 0) return;
+      if ((!this.messageText.trim() && this.pastedImages.length === 0) ||
+        !this.$store.state.userInfo ||
+        this.countdown > 0) return;
 
       try {
         // 发送文本消息
@@ -788,7 +710,7 @@ export default {
         for (const image of this.pastedImages) {
           const formData = new FormData();
           formData.append("file", image.file);
-          
+
           const response = await uploadFileApi(formData, "chat");
           if (response.data) {
             await this.sendImage(response.data);
@@ -949,7 +871,7 @@ export default {
 
       this.loading = true;
       this.shouldScrollToBottom = false;
-      
+
       try {
         const container = this.$refs.messageContainer;
         const oldScrollHeight = container.scrollHeight;
@@ -1282,21 +1204,21 @@ export default {
       // 在输入框末尾添加@用户
       const input = this.$refs.messageInput;
       const mentionText = `@${user.nickname} `;
-      
+
       // 更新messageText
       this.messageText += mentionText;
-      
+
       // 更新contenteditable div的内容
       input.innerHTML += mentionText;
 
       // 将光标移动到末尾
       const range = document.createRange();
       const selection = window.getSelection();
-      
+
       // 将range设置到input的最后
       range.selectNodeContents(input);
       range.collapse(false); // false means collapse to end
-      
+
       // 清除当前选择并应用新的range
       selection.removeAllRanges();
       selection.addRange(range);
@@ -1319,7 +1241,7 @@ export default {
         // 使用 marked 解析 Markdown 内容
         const htmlContent = marked(content);
 
-        if(!content.includes('code')){
+        if (!content.includes('code')) {
           content = content.replace(/\n/g, '<br>')
         }
 
@@ -1338,7 +1260,7 @@ export default {
       // 继续处理其他格式
       const htmlContent = marked(content);
 
-      if(!content.includes('code')){
+      if (!content.includes('code')) {
         content = content.replace(/\n/g, '<br>')
       }
 
@@ -1403,9 +1325,9 @@ export default {
         if (response.data) {
           //获取文件类型，如果是图片则是发送图片接口
           const fileType = file.type;
-          if(fileType.includes('image')){
+          if (fileType.includes('image')) {
             await this.sendImage(response.data);
-          }else{
+          } else {
             await this.sendFile(response.data, file.name, file.size);
           }
         }
@@ -1617,29 +1539,29 @@ export default {
      * 滚动到指定消息
      */
     async scrollToMessage(messageId) {
-        const container = this.$refs.messageContainer;
-        let messageElement = container.querySelector(`[data-message-id="${messageId}"]`);
+      const container = this.$refs.messageContainer;
+      let messageElement = container.querySelector(`[data-message-id="${messageId}"]`);
 
-        // 如果消息元素不存在，尝试加载更多消息
-        while (!messageElement && this.hasMore) {
-            await this.loadMoreMessages(); // 确保等待加载完成
-            messageElement = container.querySelector(`[data-message-id="${messageId}"]`);
-        }
+      // 如果消息元素不存在，尝试加载更多消息
+      while (!messageElement && this.hasMore) {
+        await this.loadMoreMessages(); // 确保等待加载完成
+        messageElement = container.querySelector(`[data-message-id="${messageId}"]`);
+      }
 
-        // 如果找到消息元素，滚动到该位置
-        if (messageElement) {
-            const offset = 100; // 设置偏移量，单位为像素
-            const topPosition = messageElement.offsetTop - offset;
-            container.scrollTo({ top: topPosition, behavior: 'smooth' });
+      // 如果找到消息元素，滚动到该位置
+      if (messageElement) {
+        const offset = 100; // 设置偏移量，单位为像素
+        const topPosition = messageElement.offsetTop - offset;
+        container.scrollTo({ top: topPosition, behavior: 'smooth' });
 
-            // 添加激活效果
-            messageElement.classList.add('active-message');
-            setTimeout(() => {
-                messageElement.classList.remove('active-message');
-            }, 2000); // 3秒后移除激活效果
-        } else {
-            this.$message.error("未能找到该消息，请尝试手动加载更多历史消息。");
-        }
+        // 添加激活效果
+        messageElement.classList.add('active-message');
+        setTimeout(() => {
+          messageElement.classList.remove('active-message');
+        }, 2000); // 3秒后移除激活效果
+      } else {
+        this.$message.error("未能找到该消息，请尝试手动加载更多历史消息。");
+      }
     },
     /**
      * 回复菜单
@@ -1668,7 +1590,7 @@ export default {
      */
     async handlePaste(event) {
       const items = event.clipboardData.items;
-      
+
       for (let item of items) {
         if (item.type.startsWith('image/')) {
           //最多只能三张
@@ -1678,7 +1600,7 @@ export default {
           }
           event.preventDefault();
           const file = item.getAsFile();
-          
+
           if (file.size > 5 * 1024 * 1024) {
             this.$message.error("图片大小不能超过5MB");
             return;
@@ -1705,6 +1627,90 @@ export default {
     removeImage(index) {
       this.pastedImages.splice(index, 1);
     },
+    // 显示添加好友对话框
+    showAddFriendDialog() {
+      this.addFriendForm.message = `我是${this.$store.state.userInfo?.nickname || ''}，请求添加您为好友`;
+      this.addFriendDialogVisible = true;
+    },
+    // 关闭添加好友对话框
+    handleCloseAddFriendDialog() {
+      this.addFriendDialogVisible = false;
+      this.$refs.addFriendForm.resetFields();
+    },
+    // 加载好友列表
+    async loadFriendsList() {
+      try {
+        // 这里需要你实现对应的API接口
+        // 示例代码：
+        // const response = await this.$http.get('/api/friends');
+        // this.friendsList = response.data;
+        // this.filteredFriendsList = [...this.friendsList];
+
+        // 临时示例数据
+        this.friendsList = [
+          {
+            id: 1,
+            name: "张三",
+            avatar: "https://foruda.gitee.com/avatar/1677004143848886034/2106773_hhf1237_1647845148.png",
+            signature: "热爱生活，热爱编程。",
+            gender: "男",
+            online: true
+          },
+          {
+            id: 2,
+            name: "李四",
+            avatar: "https://foruda.gitee.com/avatar/1677079463351115261/7467101_unique_perfect_1638710768.png",
+            signature: "旅行是我的灵魂。",
+            gender: "女",
+            online: false
+          }
+        ];
+        this.filteredFriendsList = [...this.friendsList];
+      } catch (error) {
+        console.error('加载好友列表失败:', error);
+        this.$message.error('加载好友列表失败');
+      }
+    },
+    // 发送消息给好友
+    sendMessageToFriend() {
+      if (!this.selectedFriend) {
+        this.$message.warning('请选择好友');
+        return;
+      }
+
+      // 这里可以跳转到私聊页面或打开私聊窗口
+      this.$message.info(`即将与 ${this.selectedFriend.name} 开始聊天`);
+      // 示例：跳转到私聊页面
+      // this.$router.push(`/private-chat/${this.selectedFriend.id}`);
+    },
+    // 删除好友
+    async deleteFriend() {
+      if (!this.selectedFriend) {
+        this.$message.warning('请选择好友');
+        return;
+      }
+
+      try {
+        // 显示确认对话框
+        await this.$confirm(`确定要删除好友 ${this.selectedFriend.name} 吗？`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        });
+
+        // 调用API删除好友
+        // 示例代码：
+        // await this.$http.delete(`/api/friend/${this.selectedFriend.id}`);
+
+        this.$message.success('删除成功');
+        this.selectedFriend = null;
+        this.loadFriendsList(); // 重新加载好友列表
+      } catch (error) {
+        if (error !== 'cancel') {
+          this.$message.error('删除失败: ' + (error.message || '请重试'));
+        }
+      }
+    }
   },
 };
 </script>
@@ -1722,7 +1728,7 @@ export default {
   max-width: 1200px;
   position: relative;
   z-index: 1;
-
+  
   @media screen and (max-width: 768px) {
     height: 100vh;
     margin: 0;
@@ -1756,11 +1762,9 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(52, 152, 219, 0.1) 0%,
-      rgba(44, 62, 80, 0.1) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(52, 152, 219, 0.1) 0%,
+        rgba(44, 62, 80, 0.1) 100%);
     z-index: 1;
   }
 
@@ -1822,6 +1826,7 @@ export default {
       margin: 0 $spacing-sm;
       border-radius: 16px;
       backdrop-filter: blur(8px);
+
       &:hover {
         color: white;
         background: rgba(255, 255, 255, 0.1);
@@ -2027,7 +2032,7 @@ export default {
         border-color: $primary;
         box-shadow: 0 0 0 3px rgba($primary, 0.1);
 
-        & + .search-icon {
+        &+.search-icon {
           color: $primary;
         }
       }
@@ -2064,6 +2069,7 @@ export default {
       height: 42px;
       flex-shrink: 0;
       user-select: none;
+
       img {
         width: 100%;
         height: 100%;
@@ -2130,6 +2136,7 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       width: 170px;
+
       :deep(img) {
         width: 20px !important;
         height: 20px !important;
@@ -2268,6 +2275,7 @@ export default {
         height: 36px;
         flex-shrink: 0;
         user-select: none;
+
         img {
           width: 100%;
           height: 100%;
@@ -2291,22 +2299,28 @@ export default {
             font-size: 0.85em;
             user-select: none;
             color: var(--text-secondary);
+
             .user-name {
               color: red;
             }
+
             .assistant-name {
               color: #b32ce9;
             }
           }
-          .gender{
+
+          .gender {
             font-size: 1em;
+
             &::before {
               content: '·';
             }
-            .fa-mars{
+
+            .fa-mars {
               color: #007bff;
             }
-            .fa-venus{
+
+            .fa-venus {
               color: pink;
             }
           }
@@ -2321,7 +2335,7 @@ export default {
           border-radius: 16px 16px 16px 4px;
           color: var(--text-primary);
           word-break: break-word;
-        
+
         }
       }
     }
@@ -2356,9 +2370,11 @@ export default {
       .file-upload-btn {
         color: #2daba5;
       }
+
       .voice-toggle-btn {
         color: #e67e22;
       }
+
       .toolbar-btn {
         padding: $spacing-sm;
         border: none;
@@ -2371,6 +2387,7 @@ export default {
         }
       }
     }
+
     .input-area {
       flex: 1;
       display: flex;
@@ -2511,6 +2528,7 @@ export default {
 .message-time {
   margin-left: $spacing-sm;
   color: var(--text-secondary);
+
   &::after {
     content: '·';
   }
@@ -2540,15 +2558,19 @@ export default {
     .fa-reply {
       color: #be1fde;
     }
+
     .fa-at {
       color: #0ab028;
     }
+
     .fa-download {
       color: #2daba5;
     }
+
     .fa-undo {
       color: #f5222d;
     }
+
     .fa-search {
       color: #1890ff;
     }
@@ -2671,6 +2693,7 @@ export default {
   .voice-toggle-btn {
     color: #e67e22;
   }
+
   .voice-record-btn {
     width: 500px !important;
 
@@ -2756,19 +2779,25 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: $spacing-sm;
-  position: absolute; /* 绝对定位 */
-  bottom: 100%; /* 放在输入框上方 */
-  left: 50%; /* 水平居中 */
-  transform: translateX(-50%); /* 水平居中调整 */
-  width: calc(100% - 2 * $spacing-md); /* 与输入框宽度一致 */
-  
+  position: absolute;
+  /* 绝对定位 */
+  bottom: 100%;
+  /* 放在输入框上方 */
+  left: 50%;
+  /* 水平居中 */
+  transform: translateX(-50%);
+  /* 水平居中调整 */
+  width: calc(100% - 2 * $spacing-md);
+  /* 与输入框宽度一致 */
+
   // 超出隐藏
-  .reply-title{
+  .reply-title {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
   }
+
   i {
     cursor: pointer;
     color: var(--text-primary);
@@ -2784,96 +2813,96 @@ export default {
 }
 
 :deep(pre) {
-    margin: 1em 0;
+  margin: 1em 0;
+  position: relative;
+  background: #282c34;
+  border-radius: 6px;
+  padding-top: 2.5em;
+  overflow: auto;
+
+
+  /* 调整代码内容的样式 */
+  code {
+    display: block;
+    padding: 1em;
+    padding-left: 1em;
+    /* 增加左侧padding */
+    margin-left: 0;
+    /* 移除margin */
+    overflow-x: auto;
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    line-height: 1.5;
     position: relative;
-    background: #282c34;
-    border-radius: 6px;
-    padding-top: 2.5em;
-    overflow: auto;
+    max-height: 500px;
 
-
-    /* 调整代码内容的样式 */
-    code {
-      display: block;
-      padding: 1em;
-      padding-left: 1em;
-      /* 增加左侧padding */
-      margin-left: 0;
-      /* 移除margin */
-      overflow-x: auto;
-      font-family: 'Fira Code', monospace;
-      font-size: 14px;
-      line-height: 1.5;
-      position: relative;
-      max-height: 500px;
-
-    }
-
-    /* 添加仿 macOS 风格的按钮 */
-    &::before {
-      content: '';
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #ff5f56;
-      box-shadow:
-        20px 0 0 #ffbd2e,
-        40px 0 0 #27c93f;
-    }
-
-    /* 复制按钮容器 */
-    .code-header {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      z-index: 2;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    /* 显示复制按钮 */
-    &:hover .code-header {
-      opacity: 1;
-    }
-
-    /* 复制按钮样式 */
-    .copy-button {
-      padding: 4px 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      border-radius: 4px;
-      color: #abb2bf;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-
-      i {
-        font-size: 14px;
-      }
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-      }
-
-      &.copied {
-        background: #98c379;
-        color: #fff;
-      }
-    }
   }
 
-.message {
-    .active-message {
-        background-color: rgb(222 22 22 / 55%) !important; 
-        transition: background-color 0.2s ease !important;
+  /* 添加仿 macOS 风格的按钮 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff5f56;
+    box-shadow:
+      20px 0 0 #ffbd2e,
+      40px 0 0 #27c93f;
+  }
+
+  /* 复制按钮容器 */
+  .code-header {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  /* 显示复制按钮 */
+  &:hover .code-header {
+    opacity: 1;
+  }
+
+  /* 复制按钮样式 */
+  .copy-button {
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    color: #abb2bf;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    i {
+      font-size: 14px;
     }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    &.copied {
+      background: #98c379;
+      color: #fff;
+    }
+  }
+}
+
+.message {
+  .active-message {
+    background-color: rgb(222 22 22 / 55%) !important;
+    transition: background-color 0.2s ease !important;
+  }
 }
 
 // 添加以下全局样式
@@ -2953,6 +2982,7 @@ export default {
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
+
   img {
     width: 100%;
     height: 100%;
@@ -2969,7 +2999,7 @@ export default {
     border-radius: 50%;
     cursor: pointer;
     font-size: 12px;
-    
+
     &:hover {
       background: rgba(0, 0, 0, 0.7);
     }
@@ -2993,5 +3023,145 @@ export default {
     border-color: $primary;
   }
 
+}
+
+.friends-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 $spacing-md;
+  height: 50px;
+  border-bottom: 1px solid var(--border-color);
+  
+  h3 {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .add-friend-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $primary;
+    font-size: 1.2em;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: var(--hover-bg);
+      color: darken($primary, 10%);
+    }
+  }
+}
+
+.friend-item {
+  padding: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin: $spacing-sm $spacing-xs;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+
+  &:hover,
+  &.active {
+    background: var(--hover-bg);
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  .friend-info {
+    flex: 1;
+    min-width: 0;
+
+    .name {
+      font-size: 0.95em;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .friend-status {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+
+      &.online {
+        color: #52c41a;
+      }
+    }
+  }
+}
+
+// .friend-details {
+//   padding: $spacing-lg;
+//   border-radius: 12px;
+//   margin: $spacing-lg auto;
+//   max-width: 600px;
+//   text-align: center;
+//   background: var(--card-bg);
+//   box-shadow: $shadow-md;
+//   border: 1px solid var(--border-color);
+
+//   h3 {
+//     font-size: 1.5em;
+//     font-weight: 700;
+//     color: var(--text-primary);
+//     margin-bottom: $spacing-md;
+//   }
+
+//   .signature,
+//   .gender {
+//     font-size: 1em;
+//     color: var(--text-secondary);
+//     margin-bottom: $spacing-md;
+//     padding: $spacing-sm;
+//     background: var(--hover-bg);
+//     border-radius: 6px;
+//   }
+
+//   .el-button {
+//     margin: 0 $spacing-sm;
+//   }
+// }
+
+// 在线状态指示器
+.avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f5222d;
+  border: 2px solid var(--card-bg);
+}
+
+.friend-item .avatar::after {
+  background: #f5222d;
+}
+
+.friend-item .online .avatar::after {
+  background: #52c41a;
 }
 </style>

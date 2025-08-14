@@ -115,6 +115,7 @@ public class SysArticleServiceImpl extends ServiceImpl<SysArticleMapper, SysArti
         //先删除标签在新增标签
         sysTagMapper.deleteArticleTagsByArticleIds(Collections.singletonList(obj.getId()));
         addTags(sysArticle, obj);
+
         return true;
     }
 

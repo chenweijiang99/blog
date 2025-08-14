@@ -55,7 +55,17 @@ export function updateOssApi(data: any) {
     data
   })
 }
-
+// 添加批量上传接口
+export const uploadBatchApi = (data: FormData) => {
+  return request({
+    url: '/file/uploadBatch',
+    method: 'post',
+    data: data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
 
 
 

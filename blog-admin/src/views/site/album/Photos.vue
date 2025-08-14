@@ -1,6 +1,6 @@
 <template>
-    <el-dialog title="相册照片" :model-value="props.openPhotos" width="80%" top="5vh" append-to-body destroy-on-close 
-    :close-on-click-modal="false" @update:model-value="handleDialogClose">
+    <el-dialog title="相册照片" :model-value="props.openPhotos" width="80%" top="5vh" append-to-body destroy-on-close
+        :close-on-click-modal="false" @update:model-value="handleDialogClose">
 
         <!-- 操作按钮区域 -->
         <el-card class="box-card">
@@ -9,6 +9,8 @@
                     <ButtonGroup>
                         <el-button v-permission="['sys:photo:add']" type="primary" icon="Plus"
                             @click="handleAdd">新增</el-button>
+                        <el-button v-permission="['sys:photo:add']" type="success" icon="Upload"
+                            @click="handleBatchUpload">批量上传</el-button>
                         <el-button v-permission="['sys:photo:delete']" type="danger" icon="Delete"
                             :disabled="selectedIds.length === 0" @click="handleBatchDelete">批量删除</el-button>
                         <el-button v-permission="['sys:photo:move']" type="info" icon="Notification"
@@ -21,7 +23,7 @@
             <!-- 数据表格 -->
             <div class="photo-list" v-loading="loading">
                 <el-checkbox-group v-model="selectedIds" v-for="item in photoList" :key="item.id">
-                    <div class="photo-card" >
+                    <div class="photo-card">
                         <span class="photo-select">
                             <el-checkbox :value="item.id" />
                         </span>
@@ -35,9 +37,12 @@
                                 <div class="photo-desc">{{ item.description }}</div>
                             </div>
                             <div class="photo-actions">
-                                <el-button link type="success" size="small" icon="View" @click="handlePreviewPhotos(item)">查看</el-button>
-                                <el-button link v-permission="['sys:photo:update']" type="primary" size="small" icon="Edit" @click="handleUpdate(item)">编辑</el-button>
-                                <el-button link v-permission="['sys:photo:delete']" type="danger" size="small" icon="Delete" @click="handleDelete(item)">删除</el-button>
+                                <el-button link type="success" size="small" icon="View"
+                                    @click="handlePreviewPhotos(item)">查看</el-button>
+                                <el-button link v-permission="['sys:photo:update']" type="primary" size="small"
+                                    icon="Edit" @click="handleUpdate(item)">编辑</el-button>
+                                <el-button link v-permission="['sys:photo:delete']" type="danger" size="small"
+                                    icon="Delete" @click="handleDelete(item)">删除</el-button>
                             </div>
                         </div>
                     </div>
@@ -60,16 +65,12 @@
                     <UploadImage v-model="photoForm.url" :source="'photo'" :limit="1" />
                 </el-form-item>
                 <el-form-item label="描述" prop="description">
-                    <el-input v-model="photoForm.description" type="textarea" :rows="4" show-word-limit placeholder="请输入描述"
-                        clearable />
+                    <el-input v-model="photoForm.description" type="textarea" :rows="4" show-word-limit
+                        placeholder="请输入描述" clearable />
                 </el-form-item>
                 <el-form-item label="记录时间" prop="recordTime">
-                    <el-date-picker
-                        v-model="photoForm.recordTime"
-                        type="date"
-                        value-format="YYYY-MM-DD"
-                        placeholder="请选择记录的日期..."
-                    />
+                    <el-date-picker v-model="photoForm.recordTime" type="date" value-format="YYYY-MM-DD"
+                        placeholder="请选择记录的日期..." />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input-number v-model="photoForm.sort" :min="1" />
@@ -83,25 +84,39 @@
                 </div>
             </template>
         </el-dialog>
+        <!-- 添加批量上传对话框 -->
+        <el-dialog title="批量上传照片" v-model="batchUploadDialog.visible" width="600px" append-to-body destroy-on-close>
+            <el-form ref="batchUploadFormRef" :model="batchUploadForm" :rules="batchUploadRules" label-width="80px">
+                <el-form-item label="照片" prop="files">
+                    <ImageBatch v-model="batchUploadForm.files" :source="'photo'" :limit="10" />
+                </el-form-item>
+                <el-form-item label="描述" prop="description">
+                    <el-input v-model="batchUploadForm.description" type="textarea" :rows="4" show-word-limit
+                        placeholder="请输入描述" clearable />
+                </el-form-item>
+                <el-form-item label="记录时间" prop="recordTime">
+                    <el-date-picker v-model="batchUploadForm.recordTime" type="date" value-format="YYYY-MM-DD"
+                        placeholder="请选择记录的日期..." />
+                </el-form-item>
+                <el-form-item label="排序起始" prop="sort">
+                    <el-input-number v-model="batchUploadForm.sort" :min="1" />
+                </el-form-item>
+            </el-form>
 
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="cancelBatchUpload">取 消</el-button>
+                    <el-button type="primary" :loading="batchUploadLoading" @click="submitBatchUpload">确 定</el-button>
+                </div>
+            </template>
+        </el-dialog>
         <!-- 批量移动对话框 -->
-        <el-dialog
-            title="移动照片"
-            v-model="moveDialog.visible"
-            width="400px"
-            append-to-body
-            destroy-on-close
-        >
+        <el-dialog title="移动照片" v-model="moveDialog.visible" width="400px" append-to-body destroy-on-close>
             <el-form label-width="80px">
                 <el-form-item label="目标相册">
                     <el-select v-model="moveDialog.targetAlbumId" placeholder="请选择目标相册" style="width: 100%">
-                        <el-option
-                            v-for="album in albumList"
-                            :key="album.id"
-                            :label="album.name"
-                            :value="album.id"
-                            :disabled="album.id === props.albumId"
-                        />
+                        <el-option v-for="album in albumList" :key="album.id" :label="album.name" :value="album.id"
+                            :disabled="album.id === props.albumId" />
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -121,9 +136,9 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import UploadImage from '@/components/Upload/Image.vue'
-import { listPhotoApi, addPhotoApi, updatePhotoApi, deletePhotoApi, movePhotoApi } from '@/api/site/photo'
+import { listPhotoApi, addPhotoApi, updatePhotoApi, deletePhotoApi, movePhotoApi, addBatchPhotoApi } from '@/api/site/photo'
 import { listAlbumAllApi } from '@/api/site/album'
-
+import ImageBatch from '@/components/Upload/ImageBatch.vue'
 // 查询参数
 const queryParams = reactive({
     pageNum: 1,
@@ -192,6 +207,94 @@ const rules = reactive<FormRules>({
 
 })
 
+
+// 批量上传表单数据
+const batchUploadForm = reactive<any>({
+    files: [],
+    description: '',
+    recordTime: '',
+    sort: 1
+})
+// 批量上传表单校验规则
+const batchUploadRules = reactive<FormRules>({
+    files: [
+        {
+            required: true,
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value || value.length === 0) {
+                    callback(new Error('请上传照片'))
+                } else {
+                    callback()
+                }
+            },
+            trigger: 'change'
+        }
+    ],
+    description: [
+        { required: true, message: '请输入描述', trigger: 'blur' }
+    ],
+    recordTime: [
+        { required: false, message: '请选择记录的日期', trigger: 'blur' }
+    ],
+    sort: [
+        { required: false, message: '请输入排序起始值', trigger: 'blur' }
+    ]
+})
+// 批量上传对话框控制
+const batchUploadDialog = reactive({
+    visible: false
+})
+
+const batchUploadLoading = ref(false)
+const batchUploadFormRef = ref<FormInstance>()
+
+// 批量上传按钮点击事件
+const handleBatchUpload = () => {
+    batchUploadDialog.visible = true
+    batchUploadForm.files = []
+    batchUploadForm.recordTime = ''
+    batchUploadForm.sort = 1
+}
+
+// 取消批量上传
+const cancelBatchUpload = () => {
+    batchUploadDialog.visible = false
+    batchUploadFormRef.value?.resetFields()
+}
+
+// 提交批量上传
+const submitBatchUpload = async () => {
+    if (!batchUploadFormRef.value) return
+
+    await batchUploadFormRef.value.validate(async (valid) => {
+        if (valid) {
+            batchUploadLoading.value = true
+            try {
+                // 构造照片数据
+                const photoList = batchUploadForm.files.map((url: string, index: number) => ({
+                    albumId: props.albumId,
+                    url: url,
+                    description: batchUploadForm.description+(index + 1), 
+                    recordTime: batchUploadForm.recordTime || null,
+                    sort: batchUploadForm.sort + index
+                }))
+
+                // 调用批量添加接口
+                await addBatchPhotoApi(photoList)
+                ElMessage.success('批量上传成功')
+                batchUploadDialog.visible = false
+                getList()
+            } catch (error) {
+                console.error('批量上传失败:', error)
+                ElMessage.error('批量上传失败')
+            } finally {
+                batchUploadLoading.value = false
+            }
+        }
+    })
+}
+
+
 watch(() => props.openPhotos, (newVal) => {
     if (newVal) {
         selectedIds.value = []
@@ -215,9 +318,9 @@ const getList = async () => {
 
 // 全选
 const handleAllSelect = () => {
-    if(photoList.value.length === selectedIds.value.length){
+    if (photoList.value.length === selectedIds.value.length) {
         selectedIds.value = []
-    }else{
+    } else {
         selectedIds.value = photoList.value.map(item => item.id)
     }
 }
@@ -389,7 +492,6 @@ const handleDialogClose = (val: boolean) => {
 </script>
 
 <style scoped lang="scss">
-
 .photo-list {
     display: flex;
     flex-wrap: wrap;
@@ -402,19 +504,19 @@ const handleDialogClose = (val: boolean) => {
         position: relative;
         overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        
+
         &:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-            
+
             .photo-overlay {
                 opacity: 1;
-                
+
                 .photo-content {
                     transform: translateY(0);
                     opacity: 1;
                 }
-                
+
                 .photo-actions {
                     transform: translateY(0);
                     opacity: 1;
@@ -440,9 +542,9 @@ const handleDialogClose = (val: boolean) => {
         .photo-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, 
-                rgba(0, 0, 0, 0.2) 0%,
-                rgba(0, 0, 0, 0.7) 100%);
+            background: linear-gradient(to bottom,
+                    rgba(0, 0, 0, 0.2) 0%,
+                    rgba(0, 0, 0, 0.7) 100%);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -465,7 +567,7 @@ const handleDialogClose = (val: boolean) => {
                 align-items: center;
                 gap: 5px;
                 opacity: 0.9;
-                
+
                 .time-text {
                     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
                 }
@@ -498,7 +600,7 @@ const handleDialogClose = (val: boolean) => {
             :deep(.el-button) {
                 font-weight: 500;
                 transition: all 0.3s ease;
-                
+
                 &:hover {
                     transform: scale(1.05);
                     text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
