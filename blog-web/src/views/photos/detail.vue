@@ -47,7 +47,7 @@
                 <div class="photo-info">
                   <h3 class="photo-description">{{ photo.description }}</h3>
                   <div class="photo-meta">
-                    <span class="photo-date">
+                    <span class="photo-date" v-if="photo.recordTime">
                       <i class="fas fa-calendar"></i> {{ photo.recordTime }}
                     </span>
                     <span class="photo-location" v-if="photo.location">
