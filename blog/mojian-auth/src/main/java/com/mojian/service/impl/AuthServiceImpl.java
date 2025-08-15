@@ -265,7 +265,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (response.getData() == null) {
             log.info("用户取消了 {} 第三方登录",source);
-            httpServletResponse.sendRedirect("http://117.72.179.87:85/");
+            httpServletResponse.sendRedirect("http://blog-web.wcgmallcwj.online/");
             return;
         }
         String result = com.alibaba.fastjson.JSONObject.toJSONString(response.getData());
@@ -297,7 +297,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         StpUtil.login(user.getId());
-        httpServletResponse.sendRedirect("http://117.72.179.87:85/?token=" + StpUtil.getTokenValue());
+        httpServletResponse.sendRedirect("http://blog-web.wcgmallcwj.online/?token=" + StpUtil.getTokenValue());
     }
 
     @Override

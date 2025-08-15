@@ -41,8 +41,18 @@
       <div class="photo-container">
         <div class="photo-grid" v-if="photos.length > 0">
           <div v-for="(photo,index) in photos" :key="photo.url" class="photo-item">
-            <a href="javascript:;" class="photo-card" @click="previewImage(index)">
-              <img v-lazy="photo.url" :key="photo.url" :alt="photo.description">
+            <a href="javascript:;" class="photo-card" @click="previewMedia(index)">
+              <!-- 图片 -->
+              <img v-if="!isVideo(photo.url)" v-lazy="photo.url" :key="photo.url" :alt="photo.description">
+              
+              <!-- 视频封面 -->
+              <video v-if="isVideo(photo.url)" class="video" :src="photo.url" />
+              
+              <!-- 视频标识 -->
+              <div v-if="isVideo(photo.url)" class="video-badge">
+                <i class="fas fa-play-circle"></i>
+              </div>
+              
               <div class="photo-overlay">
                 <div class="photo-info">
                   <h3 class="photo-description">{{ photo.description }}</h3>
@@ -66,6 +76,17 @@
 
       <!-- 添加图片预览组件 -->
       <mj-image-preview ref="imagePreview" />
+      <!-- 添加视频预览组件 -->
+      <div v-if="showVideoPreview" class="video-preview-overlay" @click="closeVideoPreview">
+        <div class="video-preview-content" @click.stop>
+          <div class="video-preview-header">
+            <button class="video-close-btn" @click="closeVideoPreview">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <video ref="videoPlayer" controls autoplay></video>
+        </div>
+      </div>
     </div>
     <div v-else class="loading-container">
       <div class="loading-spinner">
@@ -102,7 +123,9 @@ export default {
       },
       photos: [],
       images: [],
-      isAuthenticated: false
+      isAuthenticated: false,
+      showVideoPreview: false,
+      currentVideoUrl: ''
     }
   },
   mounted() {
@@ -117,10 +140,47 @@ export default {
       })
     },
     /**
-     * 预览图片
+     * 判断是否为视频文件
      */
-    previewImage(index) {
-      this.$refs.imagePreview.show(this.images, index)
+    isVideo(url) {
+      if (!url) return false;
+      const videoExtensions = ['.mp4', '.mov', '.avi', '.wmv', '.flv', '.webm', '.mkv'];
+      const lowerUrl = url.toLowerCase();
+      return videoExtensions.some(ext => lowerUrl.includes(ext));
+    },
+    /**
+     * 预览媒体文件
+     */
+    previewMedia(index) {
+      const media = this.photos[index];
+      if (this.isVideo(media.url)) {
+        // 如果是视频，显示视频预览
+        this.previewVideo(media.url);
+      } else {
+        // 如果是图片，使用图片预览组件
+        this.$refs.imagePreview.show(this.images, index);
+      }
+    },
+    /**
+     * 预览视频
+     */
+    previewVideo(url) {
+      this.currentVideoUrl = url;
+      this.showVideoPreview = true;
+      this.$nextTick(() => {
+        this.$refs.videoPlayer.src = url;
+        this.$refs.videoPlayer.play();
+      });
+    },
+    /**
+     * 关闭视频预览
+     */
+    closeVideoPreview() {
+      this.showVideoPreview = false;
+      if (this.$refs.videoPlayer) {
+        this.$refs.videoPlayer.pause();
+        this.$refs.videoPlayer.src = '';
+      }
     },
     /**
      * 检查相册权限
@@ -406,6 +466,44 @@ export default {
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  .video-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #2d3748, #4a5568);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    i {
+      font-size: 48px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+  .video-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    
+    i {
+      color: white;
+      font-size: 20px;
+    }
+  }
+
   .photo-overlay {
     position: absolute;
     inset: 0;
@@ -457,6 +555,63 @@ export default {
     .photo-info {
       transform: translateY(0);
     }
+  }
+}
+
+.video-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.video-preview-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  
+  .video-preview-header {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    z-index: 1001;
+  }
+  
+  .video-close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+    
+    i {
+      font-size: 20px;
+    }
+  }
+  
+  video {
+    max-width: 100%;
+    max-height: 80vh;
+    outline: none;
+    border-radius: 8px;
   }
 }
 
@@ -561,6 +716,28 @@ export default {
       }
     }
   }
+  
+  .video-preview-content {
+    width: 95%;
+    
+    .video-preview-header {
+      top: -35px;
+      right: 5px;
+    }
+    
+    .video-close-btn {
+      width: 35px;
+      height: 35px;
+      
+      i {
+        font-size: 18px;
+      }
+    }
+    
+    video {
+      max-height: 70vh;
+    }
+  }
 }
 
 .loading-container {
@@ -574,4 +751,4 @@ export default {
     color: var(--primary-color);
   }
 }
-</style> 
+</style>

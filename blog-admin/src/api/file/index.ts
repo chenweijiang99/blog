@@ -66,6 +66,15 @@ export const uploadBatchApi = (data: FormData) => {
     }
   })
 }
-
+export const deleteBatchApi = (urls: string[]) => {
+  return request({
+    url: '/file/deleteBatch',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: urls
+  })
+}
 
 

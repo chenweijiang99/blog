@@ -150,6 +150,14 @@ public class FileDetailServiceImpl extends ServiceImpl<FileDetailMapper, FileDet
         sysFileOssMapper.updateById(sysFileOss);
     }
 
+    @Override
+    public boolean deleteBatch(String[] urls) {
+        for (String url : urls) {
+            remove(new LambdaQueryWrapper<FileDetail>().eq(FileDetail::getUrl, url));
+        }
+        return true;
+    }
+
     /**
      * 保存文件分片信息
      * @param filePartInfo 文件分片信息

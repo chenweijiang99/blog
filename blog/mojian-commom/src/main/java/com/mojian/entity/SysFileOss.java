@@ -27,7 +27,8 @@ public class SysFileOss implements Serializable {
 
     @ApiModelProperty(value = "空间名")
     private String bucket;
-
+    @ApiModelProperty(value = "地域节点")
+    private String endpoint;
     @ApiModelProperty(value = "存储基础路径")
     private String basePath;
 

@@ -77,7 +77,7 @@ public class EmailUtil {
                 "          <tbody>\n" +
                 "            <tr style=\"background-color: #f8f8f8;\">\n" +
                 "              <td>\n" +
-                "                <img style=\"padding: 15px 0 15px 30px;width:50px\" src=\"http://117.72.179.87:85/localFile/logo.jpg\" />" +
+                "                <img style=\"padding: 15px 0 15px 30px;width:50px\" src=\"http://blog-web.wcgmallcwj.online/localFile/logo.jpg\" />" +
                 "                <span>韋博客 </span>\n" +
                 "              </td>\n" +
                 "            </tr>\n" +
@@ -101,7 +101,7 @@ public class EmailUtil {
                 "            <tr>\n" +
                 "              <td class=\"p-intro\">\n" +
                 "                <hr>\n" +
-                "                <p style=\"text-align: center;line-height:1.75em;\">韋 - <a href='http://117.72.179.87:85/' style='text-decoration: none;color:#409eff'>韋博客</a></p>\n" +
+                "                <p style=\"text-align: center;line-height:1.75em;\">韋 - <a href='http://blog-web.wcgmallcwj.online/' style='text-decoration: none;color:#409eff'>韋博客</a></p>\n" +
                 "              </td>\n" +
                 "            </tr>\n" +
                 "          </tbody>\n" +

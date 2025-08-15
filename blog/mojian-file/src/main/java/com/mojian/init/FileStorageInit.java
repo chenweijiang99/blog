@@ -41,7 +41,7 @@ public class FileStorageInit {
                 config.setDomain(sysFileOss.getDomain());
                 config.setBucketName(sysFileOss.getBucket());
                 config.setBasePath(sysFileOss.getBasePath());
-                config.setEndPoint(sysFileOss.getDomain());
+                config.setEndPoint(sysFileOss.getEndpoint());
                 service.getFileStorageList().addAll(FileStorageServiceBuilder
                         .buildAliyunOssFileStorage(Collections.singletonList(config),null));
             } else if (sysFileOss.getPlatform().equals(FileOssEnum.QINIU.getValue())) {

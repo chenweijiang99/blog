@@ -30,7 +30,7 @@ knife4j:
     # aaa"
     email: 1774532899@qq.com
     concat: 韋
-    url: https://117.72.179.87:85
+    url: http://blog-web.wcgmallcwj.online/
     version: v1.0
     group:
       test1:
@@ -72,7 +72,7 @@ mail:
 qq:
   app-id:
   app-secret:
-  redirect-url: https://www.shiyit.com/mojian/api/auth/callback/qq
+  redirect-url: http://blog-web.wcgmallcwj.online/mojian/api/auth/callback/qq
 weibo:
   app-id:
   app-secret:

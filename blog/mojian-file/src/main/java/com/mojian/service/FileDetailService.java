@@ -45,4 +45,5 @@ public interface FileDetailService extends FileRecorder,IService<FileDetail> {
      */
     void updateOss(SysFileOss sysFileOss);
 
+    boolean deleteBatch(String[] urls);
 }

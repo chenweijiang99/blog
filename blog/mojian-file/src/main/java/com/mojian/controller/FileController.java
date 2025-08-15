@@ -9,6 +9,7 @@ import com.mojian.common.Result;
 import com.mojian.entity.FileDetail;
 import com.mojian.entity.SysFileOss;
 import com.mojian.exception.ServiceException;
+import com.mojian.mapper.SysFileOssMapper;
 import com.mojian.service.FileDetailService;
 import com.mojian.utils.DateUtil;
 import io.swagger.annotations.Api;
@@ -125,5 +126,22 @@ public class FileController {
             fileDetailService.delete(url);
         }
         return Result.success();
+    }
+
+    @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除文件")
+    @SaCheckPermission("sys:file:delete")
+    public Result<Boolean> deleteBatch(@RequestBody String[] urls) {
+        List<String> deleteUrls = new ArrayList<>();
+        for(String url : urls){
+            boolean flag = fileStorageService.delete(url);
+            if (flag) {
+                deleteUrls.add(url);
+            }
+        }
+        if (deleteUrls.size() == urls.length) {
+            fileDetailService.deleteBatch(urls);
+        }
+        return Result.success(true);
     }
 }

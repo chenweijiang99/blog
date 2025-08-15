@@ -26,11 +26,20 @@
                 <div class="card-header">
                     <ButtonGroup>
                         <el-button type="success" icon="Setting" @click="handleOpenOssConfig">云存储配置</el-button>
+                         <el-button
+                            type="danger"
+                            plain
+                            icon="Delete"
+                            :disabled="selectedIds.length === 0"
+                            @click="handleBatchDelete"
+                        >批量删除
+                        </el-button>
                     </ButtonGroup>
                 </div>
             </template>
             <!-- 数据表格 -->
-            <el-table v-loading="loading" :data="fileList" style="width: 100%">
+            <el-table v-loading="loading" :data="fileList" style="width: 100%"  @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="55" align="center" />
                 <el-table-column label="文件内容" align="center" prop="filename">
                     <template #default="scope">
                         <el-image :preview-src-list="[scope.row.url]" :initial-index="0" :src="scope.row.url"
@@ -99,6 +108,9 @@
                     <el-form-item label="空间名" prop="bucket">
                         <el-input v-model="ossConfigForm.bucket" placeholder="请输入空间名" />
                     </el-form-item>
+                    <el-form-item label="节点" prop="endpoint">
+                        <el-input v-model="ossConfigForm.endpoint" placeholder="请输入节点名" />
+                    </el-form-item>
                     <el-form-item label="地域" prop="region">
                         <el-input v-model="ossConfigForm.region" placeholder="请输入地域" />
                     </el-form-item>
@@ -139,7 +151,7 @@
 <script setup lang="ts">
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { getFileListApi, deleteFileApi, getOssConfigApi, addOssApi, updateOssApi } from '@/api/file'
+import { getFileListApi, deleteFileApi, getOssConfigApi, addOssApi, updateOssApi,deleteBatchApi } from '@/api/file'
 import { getDictDataByDictTypesApi } from '@/api/system/dict'
 // 查询参数
 const queryParams = reactive({
@@ -172,6 +184,7 @@ const rules = reactive<FormRules>({
     accessKey: [{ required: true, message: 'accessKey不能为空', trigger: 'blur' }],
     secretKey: [{ required: true, message: 'secretKey不能为空', trigger: 'blur' }],
     bucket: [{ required: true, message: 'bucket不能为空', trigger: 'blur' }],
+    endpoint: [{ required: true, message: 'endpoint不能为空', trigger: 'blur' }],
     domain: [
         { required: true, message: '域名不能为空', trigger: 'blur' }
     ],
@@ -202,7 +215,33 @@ const getList = async () => {
     loading.value = false
 }
 
-
+// 批量删除相关
+const selectedIds = ref<any[]>([])
+const handleSelectionChange = (selection: any[]) => {
+  selectedIds.value = selection.map(item => item.url)
+}
+// 批量删除
+const handleBatchDelete = () => {
+  if (selectedIds.value.length === 0) {
+    ElMessage.warning('请至少选择一条数据')
+    return
+  }
+  
+  ElMessageBox.confirm(`是否确认删除选中的 ${selectedIds.value.length} 个文件?`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await deleteBatchApi(selectedIds.value)
+      ElMessage.success('删除成功')
+      getList()
+      selectedIds.value = []
+    } catch (error) {
+      console.error(error)
+    }
+  })
+}
 // 获取状态列表
 const getDictList = async () => {
     const { data } = await getDictDataByDictTypesApi(['sys_file_type', 'sys_file_oss'])

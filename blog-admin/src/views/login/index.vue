@@ -158,7 +158,7 @@
       <footer class="footer">
         <p>Copyright © 2024 Neat-Admin</p>
         <a href="https://beian.miit.gov.cn/" target="_blank"
-          >湘ICP备2022002110号-1</a
+          >渝ICP备2025049830号</a
         >
       </footer>
     </div>
