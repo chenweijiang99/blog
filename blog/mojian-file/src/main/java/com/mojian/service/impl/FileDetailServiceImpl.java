@@ -122,14 +122,14 @@ public class FileDetailServiceImpl extends ServiceImpl<FileDetailMapper, FileDet
     @Override
     public void addOss(SysFileOss sysFileOss) {
         //只能有一个启用的存储平台，所以需要去修改已经启动的平台
-        if (sysFileOss.getIsEnable() == Constants.YES) {
-            SysFileOss obj = sysFileOssMapper.selectOne(new LambdaQueryWrapper<SysFileOss>()
-                    .eq(SysFileOss::getIsEnable, sysFileOss.getIsEnable()));
-            if (obj != null) {
-                obj.setIsEnable(Constants.NO);
-                sysFileOssMapper.updateById(obj);
-            }
-        }
+//        if (sysFileOss.getIsEnable() == Constants.YES) {
+//            SysFileOss obj = sysFileOssMapper.selectOne(new LambdaQueryWrapper<SysFileOss>()
+//                    .eq(SysFileOss::getIsEnable, sysFileOss.getIsEnable()));
+//            if (obj != null) {
+//                obj.setIsEnable(Constants.NO);
+//                sysFileOssMapper.updateById(obj);
+//            }
+//        }
 
 
         sysFileOssMapper.insert(sysFileOss);
@@ -139,14 +139,14 @@ public class FileDetailServiceImpl extends ServiceImpl<FileDetailMapper, FileDet
     @Transactional(rollbackFor = Exception.class)
     public void updateOss(SysFileOss sysFileOss) {
         //只能有一个启用的存储平台，所以需要去修改已经启动的平台
-        if (sysFileOss.getIsEnable() == Constants.YES) {
-            SysFileOss obj = sysFileOssMapper.selectOne(new LambdaQueryWrapper<SysFileOss>()
-                    .eq(SysFileOss::getIsEnable, sysFileOss.getIsEnable()));
-            if (obj != null && !obj.getId().equals(sysFileOss.getId())) {
-                obj.setIsEnable(Constants.NO);
-                sysFileOssMapper.updateById(obj);
-            }
-        }
+//        if (sysFileOss.getIsEnable() == Constants.YES) {
+//            SysFileOss obj = sysFileOssMapper.selectOne(new LambdaQueryWrapper<SysFileOss>()
+//                    .eq(SysFileOss::getIsEnable, sysFileOss.getIsEnable()));
+//            if (obj != null && !obj.getId().equals(sysFileOss.getId())) {
+//                obj.setIsEnable(Constants.NO);
+//                sysFileOssMapper.updateById(obj);
+//            }
+//        }
         sysFileOssMapper.updateById(sysFileOss);
     }
 

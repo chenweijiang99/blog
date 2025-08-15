@@ -55,9 +55,9 @@ public class FileController {
     @ApiOperation(value = "添加存储平台配置")
     public Result<Void> addOss(@RequestBody SysFileOss sysFileOss) {
         fileDetailService.addOss(sysFileOss);
-        if (sysFileOss.getIsEnable() == Constants.YES) {
-            fileStorageService.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
-        }
+//        if (sysFileOss.getIsEnable() == Constants.YES) {
+//            fileStorageService.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
+//        }
         return Result.success();
     }
 
@@ -67,40 +67,45 @@ public class FileController {
     @ApiOperation(value = "修改存储平台配置")
     public Result<Void> updateOss(@RequestBody SysFileOss sysFileOss) {
         fileDetailService.updateOss(sysFileOss);
-        if (sysFileOss.getIsEnable() == Constants.YES) {
-            fileStorageService.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
-        }
+//        if (sysFileOss.getIsEnable() == Constants.YES) {
+//            fileStorageService.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
+//        }
         return Result.success();
     }
 
     @SaCheckLogin
     @PostMapping("/upload")
     @ApiOperation(value = "上传文件")
-    public Result<String> upload(MultipartFile file, String source) {
+    public Result<String> upload(MultipartFile file, String source, @RequestParam(required = false) String platform) {
         String path = DateUtil.parseDateToStr(DateUtil.YYYYMMDD, DateUtil.getNowDate()) + "/";
         //这个source可在前端上传文件时提供，可用来区分是头像还是文章图片等
         if (StringUtils.isNotBlank(source)) {
             path = path + source + "/";
         }
-        //获取文件名和后缀
+        if(StringUtils.isBlank(platform)){
+            platform = "local";
+        }
+        // 如果提供了platform，则使用指定的platform
         FileInfo fileInfo = fileStorageService.of(file)
                 .setPath(path)
                 .setSaveFilename(RandomUtil.randomNumbers(2) + "_" + file.getOriginalFilename()) //随机俩个数字，避免相同文件名时文件名冲突
-                .putAttr("source",source)
-                .upload();
-
+                .putAttr("source",source).setPlatform(platform).upload();
         if (fileInfo == null) {
             throw new ServiceException("上传文件失败");
         }
         return Result.success(fileInfo.getUrl());
     }
+
     @SaCheckLogin
     @PostMapping("/uploadBatch")
     @ApiOperation(value = "批量上传文件")
-    public Result<List<String>> uploadBatch(MultipartFile[] files, String source) {
+    public Result<List<String>> uploadBatch(MultipartFile[] files, String source,@RequestParam(required = false) String platform) {
         String path = DateUtil.parseDateToStr(DateUtil.YYYYMMDD, DateUtil.getNowDate()) + "/";
         if (StringUtils.isNotBlank(source)) {
             path = path + source + "/";
+        }
+        if(StringUtils.isBlank(platform)){
+            platform = "local";
         }
         List<String> urls = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -108,6 +113,7 @@ public class FileController {
                     .setPath(path)
                     .setSaveFilename(RandomUtil.randomNumbers(2) + "_" + file.getOriginalFilename()) //随机俩个数字，避免相同文件名时文件名冲突
                     .putAttr("source", source)
+                    .setPlatform( platform)
                     .upload();
             urls.add(fileInfo.getUrl());
         }

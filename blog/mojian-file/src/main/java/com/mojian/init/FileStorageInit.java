@@ -87,11 +87,12 @@ public class FileStorageInit {
                 config.setDomain(sysFileOss.getDomain());
                 service.getFileStorageList().addAll(FileStorageServiceBuilder
                         .buildLocalPlusFileStorage(Collections.singletonList(config)));
+//                service.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
+            }
 
-            }
-            if (sysFileOss.getIsEnable() == 1){
-                service.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
-            }
+//            if (sysFileOss.getIsEnable() == 1){
+//                service.getProperties().setDefaultPlatform(sysFileOss.getPlatform());
+//            }
         }
     }
 
