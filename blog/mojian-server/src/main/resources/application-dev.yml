@@ -70,8 +70,8 @@ mail:
 
 #============================第三方登录配置信息===================================
 qq:
-  app-id:
-  app-secret:
+  app-id: 102807638
+  app-secret: UwDHBuTq467xc9c0
   redirect-url: http://blog-server.wcgmallcwj.online/api/auth/callback/qq
 weibo:
   app-id:
