@@ -1,5 +1,22 @@
 <template>
   <div class="upload-container">
+    <!-- 平台选择框 -->
+    <div class="platform-selector">
+      <el-select 
+        v-model="selectedPlatform" 
+        placeholder="请选择上传平台"
+        @change="handlePlatformChange"
+        size="small"
+      >
+        <el-option
+          v-for="platform in uploadPlatforms"
+          :key="platform.value"
+          :label="platform.label"
+          :value="platform.value"
+        />
+      </el-select>
+    </div>
+
     <el-upload
       v-model:file-list="fileList"
       :action="uploadBatchUrl"
@@ -42,6 +59,7 @@ import type { UploadProps, UploadUserFile, UploadInstance } from 'element-plus'
 import { getToken } from '@/utils/auth'
 import { deleteFileApi } from '@/api/file'
 import request from '@/utils/request'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -68,8 +86,37 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-// 上传地址
-const uploadBatchUrl = `${import.meta.env.VITE_APP_BASE_API}/file/uploadBatch?source=${props.source}`
+// 解析环境变量中的平台配置
+const parsePlatforms = () => {
+  const platformsStr = import.meta.env.VITE_APP_UPLOAD_PLATFORMS
+  if (platformsStr) {
+    try {
+      return JSON.parse(platformsStr)
+    } catch (e) {
+      console.error('解析上传平台配置失败:', e)
+      return [
+        { label: '本地云', value: 'local' },
+        { label: '阿里云', value: 'ali' }
+      ]
+    }
+  }
+  // 默认平台配置
+  return [
+    { label: '本地云', value: 'local' },
+    { label: '阿里云', value: 'ali' }
+  ]
+}
+
+// 平台选项
+const uploadPlatforms = ref(parsePlatforms())
+
+// 平台选择，默认为第一个平台
+const selectedPlatform = ref(uploadPlatforms.value[0].value)
+
+// 上传地址（不包含参数）
+const uploadBatchUrl = computed(() => {
+  return `${import.meta.env.VITE_APP_BASE_API}/file/uploadBatch`
+})
 
 // 请求头
 const headers = {
@@ -82,6 +129,11 @@ const dialogVisible = ref(false)
 const uploadRef = ref<UploadInstance>()
 const uploadLoading = ref(false)
 const rawFileList = ref<File[]>([])
+
+// 处理平台切换
+const handlePlatformChange = () => {
+  // 平台切换后，下次上传会使用新平台
+}
 
 // 初始化文件列表
 const initFileList = () => {
@@ -189,6 +241,7 @@ const normalizeUrl = (url: string) => {
   }
   return url
 }
+
 // 手动提交上传
 const submitUpload = async () => {
   if (rawFileList.value.length === 0) {
@@ -204,8 +257,9 @@ const submitUpload = async () => {
     rawFileList.value.forEach(file => {
       formData.append('files', file)
     })
-    // 只通过 FormData 传递 source 参数
+    // 通过 FormData 传递 source 和 platform 参数
     formData.append('source', props.source)
+    formData.append('platform', selectedPlatform.value)
     
     // 发送请求
     const response = await uploadBatchFiles(formData)
@@ -238,7 +292,7 @@ const submitUpload = async () => {
 // 批量上传 API
 const uploadBatchFiles = (data: FormData) => {
   return request({
-    url: '/file/uploadBatch', // 移除 source 参数
+    url: '/file/uploadBatch',
     method: 'post',
     data: data,
     headers: {
@@ -266,6 +320,10 @@ watch(() => props.modelValue, () => {
     font-size: 12px;
     color: #909399;
     margin-top: 8px;
+  }
+  
+  .platform-selector {
+    margin-bottom: 16px;
   }
 }
 

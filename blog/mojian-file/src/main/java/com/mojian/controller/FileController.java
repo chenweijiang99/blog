@@ -3,11 +3,13 @@ package com.mojian.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mojian.common.Constants;
 import com.mojian.common.Result;
 import com.mojian.entity.FileDetail;
 import com.mojian.entity.SysFileOss;
+import com.mojian.enums.FileOssEnum;
 import com.mojian.exception.ServiceException;
 import com.mojian.mapper.SysFileOssMapper;
 import com.mojian.service.FileDetailService;
@@ -17,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.x.file.storage.core.FileInfo;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +37,7 @@ public class FileController {
 
     private final FileStorageService fileStorageService;
 
+    private final SysFileOssMapper sysFileOssMapper;
 
     @SaCheckLogin
     @GetMapping("/list")
@@ -83,7 +87,17 @@ public class FileController {
             path = path + source + "/";
         }
         if(StringUtils.isBlank(platform)){
-            platform = "local";
+            //判断阿里云存储配置，如果未配置则使用本地存储
+            LambdaQueryWrapper<SysFileOss> sysFileOssLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            //查询ali存储配置是否存在
+            sysFileOssLambdaQueryWrapper.eq(SysFileOss::getPlatform, FileOssEnum.ALI.getValue());
+            sysFileOssLambdaQueryWrapper.eq(SysFileOss::getIsEnable, Constants.YES);
+            SysFileOss sysFileOss = sysFileOssMapper.selectOne(sysFileOssLambdaQueryWrapper);
+            if (sysFileOss == null) {
+                platform = FileOssEnum.LOCAL.getValue();
+            } else {
+                platform = sysFileOss.getPlatform();
+            }
         }
         // 如果提供了platform，则使用指定的platform
         FileInfo fileInfo = fileStorageService.of(file)
@@ -105,7 +119,17 @@ public class FileController {
             path = path + source + "/";
         }
         if(StringUtils.isBlank(platform)){
-            platform = "local";
+            //判断阿里云存储配置，如果未配置则使用本地存储
+            LambdaQueryWrapper<SysFileOss> sysFileOssLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            //查询ali存储配置是否存在
+            sysFileOssLambdaQueryWrapper.eq(SysFileOss::getPlatform, FileOssEnum.ALI.getValue());
+            sysFileOssLambdaQueryWrapper.eq(SysFileOss::getIsEnable, Constants.YES);
+            SysFileOss sysFileOss = sysFileOssMapper.selectOne(sysFileOssLambdaQueryWrapper);
+            if (sysFileOss == null) {
+                platform = FileOssEnum.LOCAL.getValue();
+            } else {
+                platform = sysFileOss.getPlatform();
+            }
         }
         List<String> urls = new ArrayList<>();
         for (MultipartFile file : files) {

@@ -34,21 +34,41 @@
       <el-icon><Plus /></el-icon>
       <template #tip>
         <div class="upload-tip">
-          只能上传jpg/png/gif文件，且不超过{{ fileSize }}MB
+          只能上传Mp4文件，且不超过{{ fileSize }}MB
+        </div>
+      </template>
+      <!-- 自定义文件列表项 -->
+      <template #file="{ file }">
+        <div class="upload-file-item">
+          <video v-if="isVideoFile(file)" class="upload-video" :src="file.url" />
+          <div v-else class="upload-video-placeholder">
+            <el-icon class="video-icon"><VideoPlay /></el-icon>
+          </div>
+          <span class="upload-file-name" :title="file.name">{{ file.name }}</span>
+          
+          <!-- 操作按钮 -->
+          <div class="upload-file-actions">
+            <span class="upload-file-preview" @click="handlePreview(file)">
+              <el-icon><ZoomIn /></el-icon>
+            </span>
+            <span class="upload-file-delete" @click="handleItemRemove(file)">
+              <el-icon><Delete /></el-icon>
+            </span>
+          </div>
         </div>
       </template>
     </el-upload>
 
-    <!-- 图片预览对话框 -->
-    <el-dialog v-model="dialogVisible" top="5vh" title="预览图片">
-      <img :src="dialogImageUrl" alt="Preview Image" style="width: 100%; height: 500px; object-fit: contain;" />
+    <!-- 视频预览对话框 -->
+    <el-dialog v-model="dialogVisible" top="5vh" title="预览视频">
+      <video :src="dialogVideoUrl" controls style="width: 100%; height: 500px; object-fit: contain;"></video>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, VideoPlay, ZoomIn, Delete } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import { getToken } from '@/utils/auth'
 import { uploadApi,deleteFileApi } from '@/api/file'
@@ -65,7 +85,7 @@ const props = defineProps({
   },
   fileSize: {
     type: Number,
-    default: 10
+    default: 50
   },
   multiple: {
     type: Boolean,
@@ -94,10 +114,10 @@ const parsePlatforms = () => {
     }
   }
   // 默认平台配置
-  // return [
-  //   { label: '本地云', value: 'local' },
-  //   { label: '阿里云', value: 'ali' }
-  // ]
+  return [
+    { label: '本地云', value: 'local' },
+    { label: '阿里云', value: 'ali' }
+  ]
 }
 
 // 平台选项
@@ -125,12 +145,19 @@ const headers = {
 }
 
 const fileList = ref<UploadUserFile[]>([])
-const dialogImageUrl = ref('')
+const dialogVideoUrl = ref('')
 const dialogVisible = ref(false)
 
 // 处理平台切换
 const handlePlatformChange = () => {
   // 平台切换后，下次上传会使用新平台
+}
+
+// 判断是否为视频文件
+const isVideoFile = (file: UploadUserFile) => {
+  if (!file.url) return false
+  const videoExtensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm']
+  return videoExtensions.some(ext => file.url!.toLowerCase().includes(ext))
 }
 
 // 初始化文件列表
@@ -150,14 +177,27 @@ const initFileList = () => {
   }
 }
 
-// 处理图片预览
+// 处理视频预览
 const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
-  dialogImageUrl.value = uploadFile.url!
+  dialogVideoUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
 
-// 处理图片删除
-const handleRemove: UploadProps['onRemove'] = async (uploadFile: any) => {
+// 处理单项删除
+const handleItemRemove = (file: UploadUserFile) => {
+  ElMessageBox.confirm('确定要删除该文件吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    handleRemove(file, fileList.value)
+  }).catch(() => {
+    // 取消删除
+  })
+}
+
+// 处理视频删除
+const handleRemove: UploadProps['onRemove'] = async (uploadFile: any, uploadFiles: any) => {
   if (props.multiple) {
     await deleteFileApi(uploadFile.url)
     const urls = (props.modelValue as string[]).filter(url => url !== uploadFile.url)
@@ -201,15 +241,16 @@ const handleExceed: UploadProps['onExceed'] = () => {
 
 // 上传前的校验
 const beforeUpload: UploadProps['beforeUpload'] = (file) => {
-  const isImage = /^image\/(jpeg|png|gif)$/.test(file.type)
+  const isVideo = /^video\/(mp4)$/.test(file.type)
+
   const isLt = file.size / 1024 / 1024 < props.fileSize
 
-  if (!isImage) {
-    ElMessage.error('只能上传jpg/png/gif格式的图片!')
+  if (!isVideo) {
+    ElMessage.error('只能上传Mp4格式的视频!')
     return false
   }
   if (!isLt) {
-    ElMessage.error(`图片大小不能超过 ${props.fileSize}MB!`)
+    ElMessage.error(`视频大小不能超过 ${props.fileSize}MB!`)
     return false
   }
   return true
@@ -240,5 +281,81 @@ watch(() => props.modelValue, () => {
 
 :deep(.el-upload-list--picture-card) {
   --el-upload-list-picture-card-size: 100px;
+}
+
+.upload-file-item {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-video-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f7fa;
+}
+
+.video-icon {
+  font-size: 24px;
+  color: #909399;
+}
+
+.upload-file-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 12px;
+  padding: 2px 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.upload-file-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: none;
+}
+
+.upload-file-item:hover .upload-file-actions {
+  display: flex;
+}
+
+.upload-file-preview,
+.upload-file-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.upload-file-preview:hover,
+.upload-file-delete:hover {
+  background-color: rgba(0, 0, 0, 0.7);
 }
 </style>

@@ -72,16 +72,16 @@ mail:
 qq:
   app-id:
   app-secret:
-  redirect-url: http://blog-web.wcgmallcwj.online/mojian/api/auth/callback/qq
+  redirect-url: http://blog-server.wcgmallcwj.online/api/auth/callback/qq
 weibo:
   app-id:
   app-secret:
   redirect-url: https://www.shiyit.com/mojian/api/auth/weibo
 
 gitee:
-  app-id:
-  app-secret:
-  redirect-url: https://www.shiyit.com/mojian/api/auth/callback/gitee
+  app-id: 4d9b0dcb415a5bda3bf926adde953e4b9cc9316efd89ecbcd523ea4d792e99cc
+  app-secret: a73339c446e43a87970a57adcadd929b4d7d8fc3472770ded119b62cdb153b4e
+  redirect-url: http://blog-server.wcgmallcwj.online/api/auth/callback/gitee
 
 github:
   app-id:
