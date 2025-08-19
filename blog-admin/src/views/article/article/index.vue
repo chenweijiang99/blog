@@ -36,8 +36,8 @@
             <el-button type="primary" icon="Plus" @click="handleAdd" v-permission="['sys:article:add']">新增文章</el-button>
             <el-button type="danger" icon="Delete" :disabled="selectedIds.length === 0"
               v-permission="['sys:article:delete']" @click="handleBatchDelete">批量删除</el-button>
-            <el-button type="warning" icon="Setting" v-permission="['sys:article:reptile']"
-              @click="reptileDialog.visible = true">爬取文章</el-button>
+            <!-- <el-button type="warning" icon="Setting" v-permission="['sys:article:reptile']"
+              @click="reptileDialog.visible = true">爬取文章</el-button> -->
           </ButtonGroup>
         </div>
       </template>
@@ -128,40 +128,21 @@
         <el-row :gutter="20" class="mb-20">
           <el-col :span="12">
             <el-form-item label="分类" prop="categoryName">
-              <el-tag
-                type="success"
-                v-show="form.categoryName"
-                style="margin: 0 1rem 0 0"
-                :closable="true"
-                @close="removeCategory()"
-              >
+              <el-tag type="success" v-show="form.categoryName" style="margin: 0 1rem 0 0" :closable="true"
+                @close="removeCategory()">
                 {{ form.categoryName }}
               </el-tag>
               <!-- 分类选项 -->
-              <el-popover
-                placement="bottom-start"
-                width="460"
-                trigger="click"
-                v-if="!form.categoryName"
-              >
+              <el-popover placement="bottom-start" width="460" trigger="click" v-if="!form.categoryName">
                 <div class="popover-title">分类</div>
                 <!-- 输入框 -->
-                <el-input
-                  style="width: 100%"
-                  v-model="categoryName"
-                  placeholder="请输入分类名,enter添加自定义分类"
-                  @keyup.enter="saveCategory"
-                />
+                <el-input style="width: 100%" v-model="categoryName" placeholder="请输入分类名,enter添加自定义分类"
+                  @keyup.enter="saveCategory" />
                 <!-- 分类 -->
                 <div class="popover-container">
                   <div>添加分类</div>
-                  <el-tag
-                    v-for="(item, index) of categoryOptions"
-                    :key="index"
-                    style="margin-left: 3px; margin-top: 2px"
-                    class="category-item"
-                    @click="addCategory(item.name)"
-                  >
+                  <el-tag v-for="(item, index) of categoryOptions" :key="index"
+                    style="margin-left: 3px; margin-top: 2px" class="category-item" @click="addCategory(item.name)">
                     {{ item.name }}
                   </el-tag>
                 </div>
@@ -174,39 +155,21 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="标签" prop="tags">
-              <el-tag
-                v-for="(item, index) of form.tags"
-                :key="index"
-                style="margin: 0 1rem 0 0"
-                :closable="true"
-                @close="removeTag(item)"
-              >
+              <el-tag v-for="(item, index) of form.tags" :key="index" style="margin: 0 1rem 0 0" :closable="true"
+                @close="removeTag(item)">
                 {{ item }}
               </el-tag>
               <!-- 标签选项 -->
-              <el-popover
-                placement="bottom-start"
-                width="460"
-                trigger="click"
-                v-if="form.tags && form.tags.length < 3"
-              >
+              <el-popover placement="bottom-start" width="460" trigger="click" v-if="form.tags && form.tags.length < 3">
                 <div class="popover-title">标签</div>
                 <!-- 搜索框 -->
-                <el-input
-                  style="width: 100%"
-                  v-model="tagName"
-                  placeholder="请输入标签名,enter添加自定义标签"
-                  @keyup.enter="saveTag"
-                />
+                <el-input style="width: 100%" v-model="tagName" placeholder="请输入标签名,enter添加自定义标签"
+                  @keyup.enter="saveTag" />
                 <!-- 标签 -->
                 <div class="popover-container">
                   <div>添加标签</div>
-                  <el-tag
-                    v-for="(item, index) of tagOptions"
-                    :key="index"
-                    style="margin-left: 3px; margin-top: 2px"
-                    @click="addTag(item.name)"
-                  >
+                  <el-tag v-for="(item, index) of tagOptions" :key="index" style="margin-left: 3px; margin-top: 2px"
+                    @click="addTag(item.name)">
                     {{ item.name }}
                   </el-tag>
                 </div>
@@ -275,41 +238,24 @@
             </el-form-item>
           </el-col>
         </el-row>
-
-        <el-form-item label="文章内容" prop="contentMd" class="mb-20">
-          <mavon-editor placeholder="输入文章内容..." style="height: 500px; width: 100%" ref="mdRef" v-model="form.contentMd"
-            @imgDel="imgDel" @imgAdd="imgAdd">
-            <template #left-toolbar-after>
-                  <el-dropdown>
-                    <span class="el-dropdown-link">
-                      <i title="上传视频"></i>
-                      <el-icon class="op-icon fa el-icon-video-camera"
-                        ><VideoPlay
-                      /></el-icon>
-                    </span>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item>
-                          <el-upload
-                            style="display: inline-block"
-                            :show-file-list="false"
-                            name="filedatas"
-                            action=""
-                            :http-request="uploadVideo"
-                            multiple
-                          >
-                            <span>上传视频</span>
-                          </el-upload>
-                        </el-dropdown-item>
-                        <el-dropdown-item>
-                          <div @click="dialogVisible = true">添加视频地址</div>
-                        </el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </template>
-              </mavon-editor>
+         <el-form-item label="文章内容" prop="contentMd" class="mb-20">
+          <MdEditor
+            ref="mdRef"
+            v-model="form.contentMd"
+            style="height: 500px; width: 100%"
+            placeholder="输入文章内容..."
+            @on-upload-img="onUploadImg"
+            :toolbars="toolbars"
+             @onHtmlChanged="saveHtml"
+          >
+            <template #defToolbars>
+              <EmojiExtension :onInsert="insert"  />
+               <VideoExtension :onInsert="insert" :onUploadVideo="handleUploadVideo" />
+              <!-- <VideoExtension @upload-video="uploadVideo" @add-video-url="dialogVisible = true" /> -->
+            </template>
+          </MdEditor>
         </el-form-item>
+
       </el-form>
 
       <template #footer>
@@ -320,42 +266,14 @@
       </template>
     </el-dialog>
 
-    <!-- 爬取文章对话框 -->
-    <el-dialog title="爬取文章" v-model="reptileDialog.visible" width="800px">
-      <el-form ref="reptileFormRef" :model="reptileForm" :rules="rules" label-width="100px">
-        <el-form-item label="爬取地址" prop="url">
-          <el-input v-model="reptileForm.url" placeholder="请输入爬取地址" />
-        </el-form-item>
-      </el-form>
-      <div style="margin-top: 20px;">
-        <el-alert title="暂时只支持Csdn的文章爬取" type="success" :closable="false" />
-      </div>
 
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="cancel">取 消</el-button>
-          <el-button type="primary" :loading="submitLoading" @click="submitReptile">确 定</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 添加视频地址对话框 -->
-    <el-dialog center title="添加视频" v-model="dialogVisible" width="30%">
-      <el-input v-model="videoInput" placeholder="视频地址"></el-input>
-
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="addVideo">确 定</el-button>
-          <el-button @click="dialogVisible = false">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElMessageBox,ElLoading  } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
+import type { FormInstance, FormRules, UploadRequestOptions } from 'element-plus'
 import UploadImage from '@/components/Upload/Image.vue'
 import { getCategoryListApi } from '@/api/article/category'
 import { getTagListApi } from '@/api/article/tag'
@@ -363,9 +281,14 @@ import {
   getArticleListApi, getDetailApi, deleteArticleApi,
   addArticleApi, updateArticleApi, updateStatusApi, reptileArticleApi
 } from '@/api/article'
-import { uploadApi,deleteFileApi } from '@/api/file'
+import { uploadApi, deleteFileApi } from '@/api/file'
 import { getDictDataByDictTypesApi } from '@/api/system/dict'
-
+import { MdEditor, ToolbarNames, config, } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
+import EmojiExtension from '@/components/MarkdownExtensions/EmojiExtension/index.vue'
+import VideoExtension from '@/components/MarkdownExtensions/VideoExtension/index.vue'
+import type { ExposeParam, InsertContentGenerator } from 'md-editor-v3';
+import { RefSymbol } from '@vue/reactivity'
 // 模拟数据
 const categoryOptions = ref<any>([])
 
@@ -386,7 +309,8 @@ const total = ref(0)
 const tableData = ref([])
 const queryFormRef = ref<FormInstance>()
 const formRef = ref<FormInstance>()
-const mdRef = ref();
+// const mdRef = ref();
+const mdRef = ref<ExposeParam>();
 const submitLoading = ref(false)
 
 // 选中项数组
@@ -436,7 +360,42 @@ const videoInput = ref('')
 const tagName = ref('')
 const categoryName = ref('')
 
-
+const toolbars: ToolbarNames[] = [
+  'bold',
+  'underline',
+  'italic',
+  'strikeThrough',
+  '-',
+  'title',
+  'sub',
+  'sup',
+  'quote',
+  'unorderedList',
+  'orderedList',
+  'task',
+  '-',
+  'codeRow',
+  'code',
+  'link',
+  'image',
+  'table',
+  'mermaid',
+  'katex',
+  0,
+  1,
+  '-',
+  'revoke',
+  'next',
+  'save',
+  '=',
+  'prettier',
+  'pageFullscreen',
+  'fullscreen',
+  'preview',
+  'htmlPreview',
+  'catalog',
+  // 'github'
+];
 
 
 
@@ -519,62 +478,29 @@ const saveCategory = () => {
   }
 }
 
+// 处理图片上传
 
+const onUploadImg = async (files: any[], callback: (arg0: any[]) => void) => {
 
-//删除图片
-function imgDel(pos: any, $file: any) {
-   deleteFileApi(pos[0]).then((res) => {
-     ElMessage.success('删除成功')
-   })
-}
-//添加图片
-function imgAdd(pos: any, $file: any) {
-  var formdata = new FormData();
-  formdata.append("file", $file);
-  uploadApi(formdata, 'article-content').then((res) => {
-    mdRef.value.$img2Url(pos, res.data);
-  });
-}
+    const res = await Promise.all(
+      files.map((file) => {
+        return new Promise((resolve, reject) => {
+          const form = new FormData();
+          form.append('file', file);
 
-// 上传视频
-const uploadVideo = (param: any) => {
-  const loading = ElLoading.service({
-    lock: true,
-    text: 'Loading',
-    background: 'rgba(0, 0, 0, 0.7)',
-  })
-  var formData = new FormData();
-  formData.append("file", param.file);
-  return uploadApi(formData, 'article-content').then((res) => {
-    const $vm = mdRef.value;
-    $vm.insertText($vm.getTextareaDom(), {
-      prefix: `<video height=100% width=100% controls autoplay src="${res.data}"></video>`,
-      subfix: "",
-      str: "",
-    });
-    return res;
-  }).finally(() => {
-    loading.close();
-  });
-}
+          uploadApi(form, 'article-content')
+            .then((res) => {
+              resolve(res);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      })
+    );
 
-/**
- * 添加网络视频地址
- */
- const addVideo = () => {
-  // 这里获取到的是mavon编辑器实例，上面挂载着很多方法
-  const $vm = mdRef.value;
-  // 将文件名与文件路径插入当前光标位置，这是mavon-editor 内置的方法
-  $vm.insertText($vm.getTextareaDom(), {
-    prefix: `<video height=100% width=100% controls autoplay src="${videoInput.value}"></video>`,
-    subfix: "",
-    str: "",
-  });
-
-  dialogVisible.value = false;
-  videoInput.value = "";
-}
-
+     callback(res.map((item:any) => item.data));
+};
 // 获取分类列表
 const getList = async () => {
   loading.value = true
@@ -709,7 +635,6 @@ const submitForm = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       submitLoading.value = true
-      form.content = mdRef.value.d_render;
       try {
         if (dialog.type === 'add') {
           await addArticleApi(form)
@@ -732,8 +657,10 @@ const submitForm = async () => {
 const cancel = () => {
   dialog.visible = false
   reptileDialog.visible = false
+  dialogVisible.value = false
   formRef.value?.resetFields()
   reptileForm.url = ''
+  videoInput.value = ''
 }
 
 // 分页大小改变
@@ -780,6 +707,41 @@ const beforeAvatarUpload = (file: File) => {
   // 模拟上传
   form.cover = URL.createObjectURL(file)
   return false
+}
+const insert = (generator: InsertContentGenerator) => {
+  mdRef.value?.insert(generator);
+};
+
+// 在文章编辑组件中添加视频上传处理方法
+const handleUploadVideo = async (options: UploadRequestOptions) => {
+  try {
+    const formData = new FormData()
+    formData.append('file', options.file)
+    
+    // 调用你的视频上传 API
+    const res = await uploadApi(formData, 'article-video')
+    
+    // 处理上传成功后的逻辑，比如插入视频到编辑器
+    const videoUrl = res.data
+    const videoTag = `\n<video controls style="width: 100%; height: auto;" src="${videoUrl}">\n  您的浏览器不支持视频标签\n</video>\n`
+    
+    const generator: InsertContentGenerator = () => {
+      return {
+        targetValue: videoTag,
+        select: true,
+        deviationStart: 0,
+        deviationEnd: 0
+      }
+    }
+    
+    mdRef.value?.insert(generator)
+  } catch (error) {
+    ElMessage.error('视频上传失败')
+  }
+}
+
+const saveHtml = (html: string) => {
+  form.content = html
 }
 </script>
 
@@ -889,5 +851,100 @@ const beforeAvatarUpload = (file: File) => {
       }
     }
   }
+}
+
+.toolbar-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.toolbar-item:hover {
+  background-color: #f0f0f0;
+}
+
+
+/* 深色主题适配 */
+:root[data-theme='dark'] .toolbar-item:hover {
+  background-color: #444;
+}
+
+:root[data-theme='dark'] .toolbar-icon {
+  color: #c0c0c0;
+}
+
+/* 其他样式保持不变 */
+.emoji-dropdown-container :deep(.emoji-dropdown-menu) {
+  padding: 10px;
+}
+
+.emoji-grid-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+}
+
+.emoji-grid-item {
+  font-size: 18px;
+  text-align: center;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  position: relative;
+}
+
+.emoji-grid-item:hover {
+  background-color: #f0f0f0;
+}
+
+.emoji-grid-item::after {
+  content: attr(data-title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.emoji-grid-item:hover::after {
+  opacity: 1;
+}
+
+/* 深色主题适配 */
+:root[data-theme='dark'] .emoji-grid-item:hover {
+  background-color: #444;
+}
+
+:root[data-theme='dark'] .emoji-grid-item::after {
+  background-color: #eee;
+  color: #333;
+}
+/* 添加md-editor-v3的样式调整 */
+.md-editor {
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
+}
+
+.md-editor-preview {
+  font-size: 14px;
 }
 </style>
