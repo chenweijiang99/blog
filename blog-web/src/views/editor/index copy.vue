@@ -130,6 +130,7 @@ import { uploadFileApi, deleteFileApi } from '@/api/file'
 import { createArticleApi, updateArticleApi, getArticleInfoApi } from '@/api/article'
 import { getTagsApi,getCategoriesApi } from '@/api/tags'
 import { getDictDataApi } from '@/api/dict'
+
 export default {
     name: 'Editor',
     data() {
