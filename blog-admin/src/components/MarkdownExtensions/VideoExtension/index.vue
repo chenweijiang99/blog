@@ -18,7 +18,7 @@
                         </div>
                         <div class="video-option" @click="handleAddBilibiliVideo">
                             <el-icon>
-                                <Link />
+                                <VideoPlay />
                             </el-icon>
                             <span>添加B站视频嵌入代码</span>
                         </div>
@@ -27,7 +27,7 @@
             </template>
             <template #trigger>
                 <svg class="bi bi-camera-video" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="0.5">
                     <path fill-rule="evenodd"
                         d="M2.667 3.5c-.645 0-1.167.522-1.167 1.167v6.666c0 .645.522 1.167 1.167 1.167h6.666c.645 0 1.167-.522 1.167-1.167V4.667c0-.645-.522-1.167-1.167-1.167H2.667zM.5 4.667C.5 3.47 1.47 2.5 2.667 2.5h6.666c1.197 0 2.167.97 2.167 2.167v6.666c0 1.197-.97 2.167-2.167 2.167H2.667A2.167 2.167 0 0 1 .5 11.333V4.667z" />
                     <path fill-rule="evenodd"
@@ -71,7 +71,7 @@ import { reactive, ref } from 'vue'
 import type { PropType } from 'vue'
 import type { InsertContentGenerator } from 'md-editor-v3'
 import { DropdownToolbar } from 'md-editor-v3'
-import { VideoCamera, Upload, Link } from '@element-plus/icons-vue'
+import { VideoCamera, Upload, Link, VideoPlay } from '@element-plus/icons-vue'
 import type { UploadRequestOptions } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { uploadApi, deleteFileApi } from '@/api/file'

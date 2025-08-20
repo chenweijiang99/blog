@@ -135,7 +135,11 @@ const handlePlatformChange = () => {
 
 // 初始化文件列表
 const initFileList = () => {
-  if (!props.modelValue) return
+  // 当 modelValue 为空时，清空 fileList
+  if (!props.modelValue || (typeof props.modelValue === 'string' && props.modelValue === '')) {
+    fileList.value = []
+    return
+  }
   
   if (typeof props.modelValue === 'string') {
     fileList.value = [{

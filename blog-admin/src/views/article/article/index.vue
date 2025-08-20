@@ -250,7 +250,7 @@
           >
             <template #defToolbars>
               <EmojiExtension :onInsert="insert"  />
-               <VideoExtension :onInsert="insert" :onUploadVideo="handleUploadVideo" />
+              <VideoExtension :onInsert="insert" :onUploadVideo="handleUploadVideo" />
               <!-- <VideoExtension @upload-video="uploadVideo" @add-video-url="dialogVisible = true" /> -->
             </template>
           </MdEditor>
@@ -595,7 +595,7 @@ const resetQuery = () => {
 const clearForm = () => {
   form.id = undefined
   form.title = ''
-  form.cover = undefined
+  form.cover = ''
   form.summary = ''
   form.categoryName = ''
   form.tags = []
@@ -611,10 +611,11 @@ const clearForm = () => {
 
 // 新增用户
 const handleAdd = () => {
+  clearForm()
   dialog.type = 'add'
   dialog.title = '新增文章'
   dialog.visible = true
-  clearForm()
+ 
 }
 
 // 修改分类
