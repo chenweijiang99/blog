@@ -840,8 +840,10 @@ export default {
           addFeedbackApi(this.feedbackForm).then(res => {
             this.$message.success('感谢您的反馈！')
             this.feedbackForm = { ...{} }
+            
           }).finally(() => {
             this.loading = false
+            this.getMyFeedbacks()
           })
         }
       })
