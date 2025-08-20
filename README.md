@@ -1,8 +1,8 @@
 ## 博客介绍
-
+根据开源博客  拾壹博客[https://gitee.com/quequnlong/shiyi-blog] 进行了部分修改
 <p align=center>
-  <a href="http://www.shiyit.com" style="border-radius: 50%;width: 100px;height: 100px">
-    <img src="logo.ico" alt="拾壹博客" >
+  <a href="http://blog-web.wcgmallcwj.online/" style="border-radius: 50%;width: 100px;height: 100px">
+    <img src="logo.ico" alt="韋博客" >
   </a>
 </p>
 
@@ -24,14 +24,14 @@
 
 ## 在线地址
 
-**项目链接：** [拾壹博客](http://www.shiyit.com)
+**项目链接：** [韋博客](http://blog-web.wcgmallcwj.online/)
 
 ## 站点演示地址
-**后台链接：** [拾壹博客后台管理系统](https://admin.shiyit.com/#/login)
+**后台链接：** [韋博客后台管理系统](http://blog-admin.wcgmallcwj.online/login)
 
 账号:test 密码:123456
 
-**Gitee地址：** [https://gitee.com/quequnlong/shiyi-blog](https://gitee.com/quequnlong/shiyi-blog)
+**Gitee地址：** [https://gitee.com/CWJ991203/blog](https://gitee.com/CWJ991203/blog)
 
 您的star是我坚持的动力，感谢大家的支持，欢迎提交pr共同改进项目。
 
