@@ -53,4 +53,7 @@ public interface UserService {
      */
     IPage<ArticleListVo> selectMyArticle(SysArticle article);
 
+    IPage<ArticleListVo> selectMyFeedback(SysFeedback sysFeedback);
+
+    int addFeedback(SysFeedback sysFeedback);
 }

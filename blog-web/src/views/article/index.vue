@@ -506,7 +506,7 @@ export default {
      */
     shareToWeibo() {
       const url = encodeURIComponent(this.currentUrl)
-      const title = encodeURIComponent(`${this.article.title} - 拾壹博客`)
+      const title = encodeURIComponent(`${this.article.title} - 韋博客`)
       window.open(
         `http://service.weibo.com/share/share.php?url=${url}&title=${title}`,
         "renren-share", "width=490,height=700")
@@ -629,45 +629,67 @@ export default {
      * 添加复制按钮
      */
     addCopyButtons() {
-      const codeBlocks = document.querySelectorAll('.article-content pre')
-      if (!codeBlocks.length) return
+  const codeBlocks = document.querySelectorAll('.article-content pre')
+  if (!codeBlocks.length) return
 
-      codeBlocks.forEach(pre => {
-        // 检查是否已经添加过复制按钮
-        if (pre.querySelector('.code-header')) return
+  codeBlocks.forEach(pre => {
+    // 检查是否已经添加过复制按钮
+    if (pre.querySelector('.code-header')) return
 
-        // 创建复制按钮容器
-        const buttonWrapper = document.createElement('div')
-        buttonWrapper.className = 'code-header'
+    // 创建复制按钮容器
+    const buttonWrapper = document.createElement('div')
+    buttonWrapper.className = 'code-header'
 
-        // 创建复制按钮
-        const copyButton = document.createElement('button')
-        copyButton.className = 'copy-button'
-        copyButton.innerHTML = '<i class="fas fa-copy"></i> 复制'
-        copyButton.title = '复制代码'
+    // 创建复制按钮
+    const copyButton = document.createElement('button')
+    copyButton.className = 'copy-button'
+    copyButton.innerHTML = '<i class="fas fa-copy"></i> 复制'
+    copyButton.title = '复制代码'
 
-        // 添加点击事件
-        copyButton.addEventListener('click', async () => {
-          try {
-            const code = pre.querySelector('code')
-            await navigator.clipboard.writeText(code.textContent)
-            copyButton.innerHTML = '<i class="fas fa-check"></i> 已复制'
-            copyButton.classList.add('copied')
-            setTimeout(() => {
-              copyButton.innerHTML = '<i class="fas fa-copy"></i> 复制'
-              copyButton.classList.remove('copied')
-            }, 2000)
-            this.$message.success('复制成功')
-          } catch (err) {
-            this.$message.error('复制失败，请手动复制')
+    // 添加点击事件
+    copyButton.addEventListener('click', async () => {
+      try {
+        const code = pre.querySelector('code')
+        // 检查 Clipboard API 是否可用
+        if (navigator.clipboard && window.isSecureContext) {
+          // 在安全上下文中使用 Clipboard API
+          await navigator.clipboard.writeText(code.textContent)
+        } else {
+          // 降级方案：使用传统的 document.execCommand('copy')
+          const textArea = document.createElement('textarea')
+          textArea.value = code.textContent
+          textArea.style.position = 'fixed'
+          textArea.style.left = '-999999px'
+          textArea.style.top = '-999999px'
+          document.body.appendChild(textArea)
+          textArea.focus()
+          textArea.select()
+          
+          const successful = document.execCommand('copy')
+          document.body.removeChild(textArea)
+          
+          if (!successful) {
+            throw new Error('Copy failed')
           }
-        })
+        }
+        
+        copyButton.innerHTML = '<i class="fas fa-check"></i> 已复制'
+        copyButton.classList.add('copied')
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="fas fa-copy"></i> 复制'
+          copyButton.classList.remove('copied')
+        }, 2000)
+        this.$message.success('复制成功')
+      } catch (err) {
+        this.$message.error('复制失败，请手动复制')
+      }
+    })
 
-        // 将按钮添加到代码块
-        buttonWrapper.appendChild(copyButton)
-        pre.appendChild(buttonWrapper)
-      })
-    },
+    // 将按钮添加到代码块
+    buttonWrapper.appendChild(copyButton)
+    pre.appendChild(buttonWrapper)
+  })
+},
     /**
      * 初始化图片预览
      */

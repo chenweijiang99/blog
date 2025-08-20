@@ -2,7 +2,9 @@ package com.mojian.controller.user;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mojian.common.Result;
+import com.mojian.dto.feedback.SysFeedbackQueryDto;
 import com.mojian.entity.SysArticle;
+import com.mojian.entity.SysFeedback;
 import com.mojian.entity.SysUser;
 import com.mojian.service.UserService;
 import com.mojian.vo.article.ArticleListVo;
@@ -63,5 +65,18 @@ public class UserController {
     @ApiOperation(value = "获取我的文章")
     public Result<IPage<ArticleListVo>> selectMyArticle(SysArticle article){
         return Result.success(userService.selectMyArticle(article));
+    }
+
+    @GetMapping("/myFeedback")
+    @ApiOperation(value = "获取我的反馈")
+    public Result<IPage<ArticleListVo>> selectMyFeedback(SysFeedback sysFeedback){
+        return Result.success(userService.selectMyFeedback(sysFeedback));
+    }
+
+
+    @PostMapping("/addFeedback")
+    @ApiOperation(value = "添加反馈")
+    public Result<Integer> addFeedback(@RequestBody SysFeedback sysFeedback){
+        return Result.success(userService.addFeedback(sysFeedback));
     }
 }

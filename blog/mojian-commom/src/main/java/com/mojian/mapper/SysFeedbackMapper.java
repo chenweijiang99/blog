@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mojian.dto.feedback.SysFeedbackQueryDto;
 import com.mojian.entity.SysFeedback;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mojian.vo.article.ArticleListVo;
 import com.mojian.vo.feedback.SysFeedbackVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 反馈表 Mapper接口
@@ -21,4 +23,6 @@ public interface SysFeedbackMapper extends BaseMapper<SysFeedback> {
      * @return
      */
     IPage<SysFeedbackVo> page(@Param("page") Page<Object> page, @Param("sysFeedback") SysFeedbackQueryDto sysFeedback);
+
+    IPage<ArticleListVo> selectMyFeedback(Page<Object> page, @Param("sysFeedback") SysFeedback sysFeedback);
 }

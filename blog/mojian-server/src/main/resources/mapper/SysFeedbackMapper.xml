@@ -24,4 +24,8 @@
         </where>
         order by sf.create_time desc
     </select>
+
+    <select id="selectMyFeedback" resultType="com.mojian.entity.SysFeedback">
+        select * from sys_feedback where user_id = #{sysFeedback.userId}
+    </select>
 </mapper>

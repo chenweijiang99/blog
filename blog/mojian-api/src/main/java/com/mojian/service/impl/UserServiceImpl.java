@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.mojian.entity.SysArticle;
 import com.mojian.entity.SysComment;
+import com.mojian.entity.SysFeedback;
 import com.mojian.entity.SysUser;
 import com.mojian.mapper.*;
 import com.mojian.service.UserService;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
 
     private final SysTagMapper tagMapper;
 
+    private final SysFeedbackMapper feedbackMapper;
     @Override
     public IPage<CommentListVo> selectMyComment() {
         return commentMapper.selectMyComment(PageUtil.getPage(), StpUtil.getLoginIdAsLong());
@@ -67,6 +69,18 @@ public class UserServiceImpl implements UserService {
     public IPage<ArticleListVo> selectMyArticle(SysArticle article) {
         article.setUserId(StpUtil.getLoginIdAsLong());
         return articleMapper.selectMyArticle(PageUtil.getPage(),article);
+    }
+
+    @Override
+    public IPage<ArticleListVo> selectMyFeedback(SysFeedback sysFeedback) {
+        sysFeedback.setUserId(StpUtil.getLoginIdAsLong());
+        return feedbackMapper.selectMyFeedback(PageUtil.getPage(),sysFeedback);
+    }
+
+    @Override
+    public int addFeedback(SysFeedback sysFeedback) {
+        sysFeedback.setUserId(StpUtil.getLoginIdAsLong());
+        return feedbackMapper.insert(sysFeedback);
     }
 
 }
