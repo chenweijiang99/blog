@@ -2,7 +2,7 @@
 根据开源博客  [拾壹博客](https://gitee.com/quequnlong/shiyi-blog) 进行了部分修改
 <p align=center>
   <a href="http://blog-web.wcgmallcwj.online/" style="border-radius: 50%;width: 100px;height: 100px">
-    <img src="logo.ico" alt="韋博客" >
+    <img src="logo.png" alt="韋博客" >
   </a>
 </p>
 
