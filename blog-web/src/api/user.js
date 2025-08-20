@@ -82,7 +82,7 @@ export function getMyLikeApi(params) {
  */
 export function getMyFeedbackApi(params) {
     return request({
-        url: '/sys/feedback/list',
+        url: '/protal/user/myFeedback',
         method: 'get',
         params
     })
@@ -93,7 +93,7 @@ export function getMyFeedbackApi(params) {
  */
 export function addFeedbackApi(data) {
     return request({
-        url: '/sys/feedback/add',
+        url: '/protal/user/addFeedback',
         method: 'post',
         data
     })

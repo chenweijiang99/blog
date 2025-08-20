@@ -926,7 +926,6 @@ export default {
       this.loading = true
       let params = {
         ...this.params,
-        source: 'PC'
       }
       getMyFeedbackApi(params).then(res => {
         this.myFeedbacks = res.data.records
