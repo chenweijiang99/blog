@@ -12,12 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-/**
- * @author: 拾壹
- * @date: 2023/11/13
- * @describe:
- */
-
 @ServerEndpoint(value = "/websocket/{userId}")
 @Component
 public class WebSocketServer {

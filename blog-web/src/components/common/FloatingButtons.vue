@@ -1,11 +1,11 @@
 <template>
   <div class="floating-buttons" :class="{ 'show-top': showBackToTop }">
 
-    <el-tooltip content="聊天" placement="left">
+    <!-- <el-tooltip content="聊天" placement="left">
       <router-link to="/chat" class="float-btn chat-btn" title="聊天">
       <i class="fas fa-comments"></i>
     </router-link>
-    </el-tooltip>
+    </el-tooltip> -->
  
     <el-tooltip content="切换主题" placement="left">
       <button class="float-btn theme-btn" @click="toggleTheme" title="切换主题">

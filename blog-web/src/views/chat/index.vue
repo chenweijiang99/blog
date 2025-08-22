@@ -514,7 +514,6 @@ export default {
       try {
         const wsUrl = import.meta.env.VITE_APP_WEBSOCKET_API;
         this.ws = new WebSocket(wsUrl + this.$store.state.userInfo.id);
-
         this.ws.onopen = () => {
           console.log("WebSocket连接已建立");
           this.reconnectAttempts = 0;
