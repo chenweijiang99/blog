@@ -6,31 +6,45 @@
       <div class="message-container">
         <h1 class="message-title">留言板</h1>
         <div class="message-input-wrapper">
-          <el-input class="input" v-model="content" placeholder="说点什么吧" @keyup.enter.native="addToList"
-            @focus="show = true"></el-input>
-          <el-button style="opacity: .6;" class="ml-3" round @click="addToList" v-show="show">发送</el-button>
+          <el-input 
+            class="input" 
+            v-model="content" 
+            placeholder="说点什么吧" 
+            @keyup.enter="addToList"
+            @focus="show = true"
+          ></el-input>
+          <el-button 
+            style="opacity: .6;" 
+            class="ml-3" 
+            round 
+            @click="addToList" 
+            v-show="show"
+          >
+            发送
+          </el-button>
         </div>
       </div>
       <!-- 弹幕列表 -->
       <div class="barrage-container">
         <vue-danmaku
-        class="danmaku"
+          class="danmaku"
           :danmus="barrageList"
           style="height: 100%; width: 100%"
           use-slot
           :speed="150"
           :channel-count="15"
         >
-          <template v-slot:danmu="{ danmu }">
+          <template #danmu="{ danmu }">
             <span class="barrage-items">
               <img
                 :src="danmu.avatar"
                 width="30"
                 height="30"
                 style="border-radius: 50%"
+                alt="avatar"
               />
-              {{ danmu.nickname }}:{{ danmu.content }}</span
-            >
+              {{ danmu.nickname }}:{{ danmu.content }}
+            </span>
           </template>
         </vue-danmaku>
       </div>
@@ -38,85 +52,79 @@
   </div>
 </template>
 
-<script>
-import { getMessagesApi, addMessageApi } from "@/api/message";
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
+import { ElMessage } from 'element-plus'
+import VueDanmaku from 'vue-danmaku'
+import { getMessagesApi, addMessageApi } from "@/api/message"
 
-import VueDanmaku from 'vue-danmaku';
-export default {
-  components: {
-    VueDanmaku
-  },
+// 响应式数据
+const show = ref(false)
+const content = ref("")
+const count = ref(null)
+const timer = ref(null)
+const barrageList = ref([])
+const store = useStore()
+const user = computed(() => store.state.userInfo)
 
-  data() {
-    return {
-      show: false,
-      content: "",
-      count: null,
-      timer: null,
-      barrageList: [],
-      user: this.$store.state.userInfo,
-    };
-  },
-  mounted() {
-    this.listMessage();
-  },
-  methods: {
-    /**
-     * 添加留言
-     */
-    addToList() {
-      if (this.count) {
-        this.$message.error("30秒后才能再次留言");
-        return false;
-      }
-      if (this.content.trim() === "") {
+// 计算属性
+const cover = computed(() => {
+  var coverUrl = new URL('@/assets/message-cover.jpg', import.meta.url).href
+  return "background: url(" + coverUrl + ") center center / cover no-repeat"
+})
 
-        this.$message.error("留言不能为空");
-        return false;
-      }
-      var message = {
-        avatar: this.user ? this.user.avatar : this.$store.state.webSiteInfo.touristAvatar,
-        status: 1,
-        nickname: this.user ? this.user.nickname : "游客",
-        content: this.content
-      };
-
-      this.content = "";
-      addMessageApi(message).then(res => {
-        this.barrageList.push(message);
-        this.$message.success("留言成功");
-      }).catch(err => {
-        this.$message.error("留言失败");
-      });
-      const TIME_COUNT = 30;
-      if (!this.timer) {
-        this.count = TIME_COUNT;
-        this.timer = setInterval(() => {
-          if (this.count > 0 && this.count <= 30) {
-            this.count--;
-          } else {
-            clearInterval(this.timer);
-            this.timer = null;
-          }
-        }, 1000);
-      }
-    },
-    /**
-     * 获取留言列表
-     */
-    listMessage() {
-      getMessagesApi().then(res => {
-        this.barrageList = res.data;
-      });
-    }
-  },
-  computed: {
-    cover() {
-      var cover = new URL('@/assets/message-cover.jpg', import.meta.url).href;
-      return "background: url(" + cover + ") center center / cover no-repeat";
-    }
+// 方法
+const addToList = () => {
+  if (count.value) {
+    ElMessage.error("30秒后才能再次留言")
+    return false
   }
-};
+  if (content.value.trim() === "") {
+    ElMessage.error("留言不能为空")
+    return false
+  }
+  
+  const message = {
+    avatar: user.value ? user.value.avatar : store.state.webSiteInfo.touristAvatar,
+    status: 1,
+    nickname: user.value ? user.value.nickname : "游客",
+    content: content.value
+  }
+
+  content.value = ""
+  addMessageApi(message).then(res => {
+    barrageList.value.push(message)
+    ElMessage.success("留言成功")
+  }).catch(err => {
+    ElMessage.error("留言失败")
+  })
+  
+  const TIME_COUNT = 30
+  if (!timer.value) {
+    count.value = TIME_COUNT
+    timer.value = setInterval(() => {
+      if (count.value > 0 && count.value <= 30) {
+        count.value--
+      } else {
+        clearInterval(timer.value)
+        timer.value = null
+      }
+    }, 1000)
+  }
+}
+
+// 获取留言列表
+const listMessage = () => {
+  getMessagesApi().then(res => {
+    barrageList.value = res.data || []
+  })
+}
+
+// 生命周期
+onMounted(() => {
+  listMessage()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -133,7 +141,6 @@ export default {
   bottom: 0;
   background-color: $primary;
   animation: header-effect 1s;
-
 
   .message-container {
     position: absolute;
@@ -182,15 +189,14 @@ export default {
     width: 100%;
 
     .barrage-items {
-      background: #000;
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 100px;
       color: #fff;
       padding: 5px 10px 5px 5px;
       align-items: center;
-      display: flex;
-      margin-top: 10PX;
+      display: inline-flex;
+      margin-top: 10px;
     }
   }
-
 }
 </style>

@@ -82,7 +82,7 @@ public class AuthController {
         return Result.success(authService.getWechatLoginCode());
     }
 
-    @ApiOperation(value = "获取微信扫码登录验证码")
+    @ApiOperation(value = "判断微信是否登陆成功")
     @GetMapping("/api/wechat/isLogin/{loginCode}")
     public Result<LoginUserInfo> getWechatIsLogin(@PathVariable String loginCode){
         return Result.success(authService.getWechatIsLogin(loginCode));
