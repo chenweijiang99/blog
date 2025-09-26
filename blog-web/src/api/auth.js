@@ -101,7 +101,34 @@ export function getAuthRenderApi(source) {
     method: 'get',
   })
 } 
+/**
+ * 获取聚合登录授权地址
+ */
+export function getJuHeLoginApi(source) {
+  return request({
+    url: `/api/juhe/getJuHeAuth/${source}`,
+    method: 'get',
+  })
+} 
+/**
+ * 获取聚合登录状态
+ */
+export function getJuHeIsLoginApi(cxid) {
+  return request({
+    url: `/api/juhe/checkLogin/${cxid}`,
+    method: 'get',
+  })
+}
 
+/**
+ * 检查第三方登录状态
+ */
+export function checkThirdPartyLoginStatus(source) {
+  return request({
+    url: `/api/auth/checkStatus/${source}`,
+    method: 'get',
+  })
+}
 
 // 获取验证码
 export function getCaptchaApi() {

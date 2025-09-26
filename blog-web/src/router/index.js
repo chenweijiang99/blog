@@ -198,7 +198,7 @@ const routes = [
               }, {
                 path: '/login',
                 name: 'Login',
-                component: () => import('@/views/login/index.vue'),
+                component: () => import('@/views/login/index1.vue'),
                 meta: {
                   title: '登录',
                   hidden: true,
