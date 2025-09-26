@@ -76,7 +76,7 @@ qq:
 weibo:
   app-id:
   app-secret:
-  redirect-url:
+  redirect-url:  1111
 
 gitee:
   app-id: 4d9b0dcb415a5bda3bf926adde953e4b9cc9316efd89ecbcd523ea4d792e99cc
