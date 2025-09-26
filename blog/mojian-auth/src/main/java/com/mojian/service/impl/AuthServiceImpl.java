@@ -265,7 +265,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (response.getData() == null) {
             log.info("用户取消了 {} 第三方登录",source);
-            httpServletResponse.sendRedirect("http://blog-web.wcgmallcwj.online/");
+            httpServletResponse.sendRedirect("https://blog-web.wcgmallcwj.online/");
             return;
         }
         String result = com.alibaba.fastjson.JSONObject.toJSONString(response.getData());
@@ -292,12 +292,12 @@ public class AuthServiceImpl implements AuthService {
                     .avatar(jsonObject.get("avatar").toString())
                     .build();
             userMapper.insert(user);
-            //添加角色
+            //添加角色s
             insertRole(user);
         }
 
         StpUtil.login(user.getId());
-        httpServletResponse.sendRedirect("http://blog-web.wcgmallcwj.online/?token=" + StpUtil.getTokenValue());
+        httpServletResponse.sendRedirect("https://blog-web.wcgmallcwj.online/?token=" + StpUtil.getTokenValue());
     }
 
     @Override

@@ -76,14 +76,14 @@ qq:
 weibo:
   app-id:
   app-secret:
-  redirect-url: https://www.shiyit.com/mojian/api/auth/weibo
+  redirect-url:
 
 gitee:
   app-id: 4d9b0dcb415a5bda3bf926adde953e4b9cc9316efd89ecbcd523ea4d792e99cc
   app-secret: a73339c446e43a87970a57adcadd929b4d7d8fc3472770ded119b62cdb153b4e
-  redirect-url: http://blog-server.wcgmallcwj.online/api/auth/callback/gitee
+  redirect-url: https://blog-server.wcgmallcwj.online/api/auth/callback/gitee
 
 github:
-  app-id:
-  app-secret:
-  redirect-url: https://www.shiyit.com/shiyi/mojian/api/auth/callback/github
+  app-id: Ov23liuq94w75TUbk1ZO
+  app-secret: e30ab9a35e0888eb9d76c04460f374d694cfe1c1
+  redirect-url: https://blog-server.wcgmallcwj.online/api/auth/callback/github
