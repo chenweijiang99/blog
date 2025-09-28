@@ -33,7 +33,7 @@ import java.nio.file.Files;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @Slf4j
 @RestController
 @RequestMapping("/file")

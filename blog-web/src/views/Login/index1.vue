@@ -515,22 +515,22 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url("@/assets/login-bg.svg") no-repeat;
-  background-size: cover;
+  background: var(--background);
   min-height: 100vh;
   z-index: 2000;
+  transition: background 0.3s ease;
 }
 
 .login-body {
   width: 420px;
   padding: 32px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
   position: relative;
+  transition: all 0.3s ease;
 }
 
 .form-container {
@@ -551,7 +551,7 @@ export default {
 
   :deep(.el-input__prefix) {
     left: 12px;
-    color: #6b7280;
+    color: var(--text-secondary);
   }
 }
 
@@ -560,7 +560,7 @@ export default {
   height: 42px;
   border: none;
   border-radius: 8px;
-  background: #6366f1;
+  background: $primary;
   color: #fff;
   font-size: 16px;
   font-weight: 500;
@@ -568,7 +568,7 @@ export default {
   transition: all 0.2s;
 
   &:hover {
-    background: #4f46e5;
+    background: darken($primary, 10%);
     transform: translateY(-1px);
   }
 
@@ -579,10 +579,10 @@ export default {
 
 .divider {
   margin: 24px 0;
-  color: #9ca3af;
+  color: var(--text-secondary);
 
   :deep(.el-divider__text) {
-    background-color: #fff;
+    background-color: var(--surface);
     padding: 0 12px;
     font-size: 14px;
   }
@@ -607,10 +607,11 @@ export default {
   font-size: 20px;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f3f4f6;
+  background: var(--hover-bg);
 
   &:hover {
     transform: translateY(-2px);
+    background: var(--border-color);
   }
 
   &.github {
@@ -667,7 +668,7 @@ export default {
   justify-content: center;
   align-items: center;
   margin-top: 24px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
 
   a {
@@ -683,7 +684,7 @@ export default {
 }
 
 .divider-line {
-  color: #e5e7eb;
+  color: var(--border-color);
   margin: 0 12px;
 }
 
@@ -698,8 +699,9 @@ export default {
   height: 200px;
   margin: 0 auto 16px;
   padding: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
+  background: var(--surface);
 
   img {
     width: 100%;
@@ -710,7 +712,7 @@ export default {
 
 .qrcode-tip {
   margin: 8px 0;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -732,13 +734,13 @@ export default {
 .form-title {
   font-size: 24px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-primary);
   margin: 0 0 8px;
 }
 
 .form-subtitle {
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -781,12 +783,12 @@ export default {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f3f4f6;
+  background: var(--hover-bg);
   border: none;
-  color: #6b7280;
+  color: var(--text-secondary);
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--border-color);
     transform: rotate(180deg);
   }
 
@@ -807,15 +809,15 @@ export default {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f3f4f6;
+  background: var(--hover-bg);
   border: none;
-  color: #6b7280;
+  color: var(--text-secondary);
   z-index: 1;
 
   &:hover {
-    background: #e5e7eb;
+    background: var(--border-color);
     transform: translateX(-4px);
-    color: #6366f1;
+    color: $primary;
   }
 
   i {

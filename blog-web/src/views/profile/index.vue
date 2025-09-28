@@ -481,7 +481,7 @@ export default {
       currentTab: 'profile',
       tabs: [
         { key: 'profile', label: '个人资料', icon: 'fas fa-user' },
-        { key: 'binding', label: '账号绑定', icon: 'fas fa-link' },
+        // { key: 'binding', label: '账号绑定', icon: 'fas fa-link' },
         { key: 'moments', label: '我的说说', icon: 'fas fa-comment' }, // 添加我的说说菜单项
         { key: 'posts', label: '我的文章', icon: 'fas fa-file-alt' },
         { key: 'comments', label: '我的评论', icon: 'fas fa-comments' },
