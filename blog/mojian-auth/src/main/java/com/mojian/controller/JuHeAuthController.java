@@ -21,8 +21,8 @@ public class JuHeAuthController {
     public JuHeLoginResponse getJuHeAuth(@PathVariable Integer type) {
         return juHeService.getJuHeAuth(type);
     }
-    @GetMapping("/api/juhe/checkLogin/{cxid}")
-    public LoginUserInfo checkLogin(@PathVariable String cxid) throws IOException {
-        return juHeService.checkJuHeLogin(cxid);
+    @GetMapping("/api/juhe/checkLogin/{userUid}")
+    public void checkLogin(@PathVariable String userUid, HttpServletResponse httpServletResponse) throws IOException {
+       juHeService.checkJuHeLogin(userUid,httpServletResponse);
     }
 }

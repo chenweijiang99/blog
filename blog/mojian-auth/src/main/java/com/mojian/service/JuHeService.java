@@ -10,5 +10,5 @@ public interface JuHeService {
 
     JuHeLoginResponse getJuHeAuth(Integer type);
 
-    LoginUserInfo checkJuHeLogin(String cxid) throws IOException;
+    void checkJuHeLogin(String cxid, HttpServletResponse httpServletResponse) throws IOException;
 }

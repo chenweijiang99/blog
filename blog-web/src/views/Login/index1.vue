@@ -10,8 +10,8 @@
         </el-tooltip>
 
 
-        <!-- 账号密码登录表单 -->
-        <div class="form-container">
+        <!-- 登录表单 -->
+        <div v-show="currentForm === 'login'" class="form-container">
           <div class="form-header">
             <h2 class="form-title">账号密码登录</h2>
             <p class="form-subtitle">欢迎回来,请输入您的账号</p>
@@ -53,8 +53,10 @@
           <div class="third-party-login">
             <div v-for="item in loginTypes" @click="handleThirdPartyLogin(item.type)">
               <el-tooltip :content="item.title" placement="top">
+                <div class="login-icon">
+                  <svg-icon :icon-class="item.icon"></svg-icon>
+                </div>
 
-                <svg-icon :icon-class="item.icon"></svg-icon>
               </el-tooltip>
             </div>
           </div>
@@ -96,7 +98,7 @@
             </el-form-item>
 
             <div class="form-switch">
-              已有账号？<a @click="switchForm('account')">立即登录</a>
+              已有账号？<a @click="switchForm('login')">立即登录</a>
             </div>
           </el-form>
         </div>
@@ -133,23 +135,19 @@
             </el-form-item>
 
             <div class="form-switch">
-              <a @click="switchForm('account')">返回登录</a>
+              <a @click="switchForm('login')">返回登录</a>
             </div>
           </el-form>
         </div>
       </div>
     </div>
 
-    <!-- 滑块验证 -->
-    <el-dialog title="请拖动滑块完成拼图" width="360px" :visible.sync="isShowSliderVerify" :close-on-click-modal="false"
-      @close="refresh" append-to-body>
-      <slider-verify ref="sliderVerify" @success="onSuccess" @fail="onFail" @again="onAgain" />
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import { getWebConfigApi, reportApi, getNoticeApi } from '@/api/site'
 import { disableScroll, enableScroll } from "@/utils/scroll";
 import {
   sendEmailCodeApi,
@@ -168,6 +166,7 @@ export default {
   },
   data() {
     return {
+      currentForm: "login",
       cxid: "",
       loading: false,
       wechatForm: {
@@ -298,30 +297,21 @@ export default {
         ],
         code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
       },
-      rememberMe: false,
+
     };
   },
 
   created() {
     Object.keys(this.loginTypes).forEach((key) => {
-      if (!this.$store.state.webSiteInfo?.loginTypeList?.includes(key)) {
+      if (!this.$store.state.webSiteInfo.loginTypeList.includes(key)) {
         delete this.loginTypes[key];
       }
     });
-    this.getWechatLoginCode();
-    this.$nextTick(() => {
-      disableScroll();
-    });
+
+
+
   },
   methods: {
-    /**
-     * 滑块验证成功
-     */
-    async onSuccess(captcha) {
-      this.loginForm.nonceStr = captcha.nonceStr;
-      this.loginForm.value = captcha.value;
-      this.login();
-    },
     async login() {
       this.loading = true;
       try {
@@ -331,29 +321,11 @@ export default {
         this.handleClose();
       } catch (error) {
         this.$message.error(error.message || "登录失败，请重试");
-        this.refresh();
       } finally {
         this.loading = false;
       }
     },
-    /**
-     * 滑块验证失败
-     */
-    onFail() {
-      this.$message.error("验证失败，请重试");
-    },
-    /**
-     * 滑块验证重新开始
-     */
-    onAgain() {
-      this.$message.error("验证失败，请重试");
-    },
-    /**
-     * 刷新
-     */
-    refresh() {
-      this.$refs.sliderVerify.refresh();
-    },
+
     /**
      * 切换表单
      * @param form
@@ -361,10 +333,6 @@ export default {
     switchForm(form) {
       this.currentForm = form;
       this.loading = false;
-      this.clearTimer();
-      if (form === "login") {
-        this.getWechatLoginCode();
-      }
     },
     /**
      * 登录
@@ -455,28 +423,6 @@ export default {
       });
     },
 
-
-    /**
-     * 检查登录状态
-     */
-    checkLoginStatus() {
-      this.pollingTimer = setInterval(() => {
-        checkThirdPartyLoginStatus(this.cxid).then((res) => {
-          if (res.code === 200) {
-            this.$store.commit("SET_TOKEN", res.data.token);
-            this.$store.commit("SET_USER_INFO", res.data);
-            clearInterval(this.pollingTimer);
-            this.$message.success("登录成功");
-            this.handleClose();
-          }
-        });
-      }, 5000);
-
-
-    },
-
-
-
     /**
      * 关闭登录弹窗
      */
@@ -525,26 +471,15 @@ export default {
           this.codeSending = false;
         });
     },
-
     /**
-     * 清理定时器
-     */
+       * 清理定时器
+       */
     clearTimer() {
       if (this.codeTimer) {
         clearInterval(this.codeTimer);
       }
       if (this.pollingTimer) {
         clearInterval(this.pollingTimer);
-      }
-    },
-
-    handleSwitchForm() {
-      if (this.currentForm === "login") {
-        this.switchForm("account");
-      } else if (this.currentForm === "account") {
-        this.switchForm("login");
-      } else {
-        this.switchForm("login");
       }
     },
 
@@ -558,6 +493,15 @@ export default {
   beforeDestroy() {
     enableScroll();
     this.clearTimer();
+  },
+  watch: {
+    '$route'(to) {
+      const message = to.query.message;
+      if (message) {
+        this.$message.error(message);
+      }
+    },
+
   },
 };
 </script>
@@ -647,8 +591,10 @@ export default {
 .third-party-login {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  max-width: 340px;
+  margin: 0 auto 24px;
   gap: 16px;
-  margin-bottom: 24px;
 }
 
 .login-icon {
@@ -852,7 +798,7 @@ export default {
 .back-btn {
   position: absolute;
   top: 16px;
-  right: 60px;
+  right: 16px;
   width: 36px;
   height: 36px;
   border-radius: 50%;

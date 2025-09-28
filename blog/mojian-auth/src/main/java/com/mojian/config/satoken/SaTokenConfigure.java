@@ -17,6 +17,7 @@ public class SaTokenConfigure implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/auth/login",
                         "/auth/logout",
+                        "/api/juhe/**",
                         "/auth/verify",
                         "/swagger-ui/**",          // knife4j接口文档
                         "/webjars/**",        // knife4j相关资源

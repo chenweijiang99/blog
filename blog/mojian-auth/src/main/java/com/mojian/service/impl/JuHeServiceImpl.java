@@ -1,16 +1,17 @@
 package com.mojian.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojian.common.Constants;
+import com.mojian.common.RedisConstants;
+import com.mojian.config.properties.FrontProperties;
+import com.mojian.config.properties.JuHeLoginConfigProperties;
 import com.mojian.dto.JuHeCheckLoginResponse;
 import com.mojian.dto.JuHeLoginResponse;
-import com.mojian.dto.user.LoginUserInfo;
 import com.mojian.entity.SysRole;
 import com.mojian.entity.SysUser;
 import com.mojian.mapper.SysRoleMapper;
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -38,25 +40,40 @@ public class JuHeServiceImpl implements JuHeService {
     private final SysUserMapper userMapper;
     private final SysRoleMapper sysRoleMapper;
     private final RedisUtil redisUtil;
+    private final JuHeLoginConfigProperties juHeLoginConfigProperties;
+    private final FrontProperties frontProperties;
     @Override
     public JuHeLoginResponse getJuHeAuth(Integer type) {
-        String result = HttpUtil.get("http://101.35.2.25/api/user/jhdl.php?id=10008450&key=86b9b28af476d230a39d3acb574c01eb&type=" + type);
+        String userUid = IpUtil.getIp() + "_" + type + "_" + UUID.randomUUID();
+        String apiUrl = juHeLoginConfigProperties.getLoginUrl()
+                + "?id=" + juHeLoginConfigProperties.getId()
+                + "&key=" + juHeLoginConfigProperties.getKey()
+                + "&return=" + juHeLoginConfigProperties.getReturnUrl()+ userUid
+                + "&type=" + type;
+        String result = HttpUtil.get(apiUrl);
         ObjectMapper  objectMapper = new ObjectMapper();
         new JuHeLoginResponse();
         JuHeLoginResponse juHeLoginResponse;
         try {
             juHeLoginResponse = objectMapper.readValue(result, JuHeLoginResponse.class);
+            redisUtil.set(userUid, juHeLoginResponse.getCxid(), RedisConstants.FIVE_MINUTES_EXPIRE, TimeUnit.MINUTES);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
-
         return juHeLoginResponse;
     }
 
     @Override
-    public LoginUserInfo checkJuHeLogin(String cxid) throws IOException {
-        String result = HttpUtil.get("http://101.35.2.25/api/user/jhdlq.php?id=10008450&key=86b9b28af476d230a39d3acb574c01eb&cxid=" + cxid);
+    public void checkJuHeLogin(String userUid, HttpServletResponse httpServletResponse) throws IOException {
+        String cxid = redisUtil.get(userUid).toString();
+        if (ObjectUtils.isEmpty(cxid)) {
+            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?message='登录过期'" );
+        }
+        String checkUrl = juHeLoginConfigProperties.getCheckLoginUrl()
+                + "?id=" + juHeLoginConfigProperties.getId()
+                + "&key=" + juHeLoginConfigProperties.getKey()
+                + "&cxid=" + cxid;
+        String result = HttpUtil.get(checkUrl);
         ObjectMapper  objectMapper = new ObjectMapper();
         JuHeCheckLoginResponse juHeCheckLoginResponse;
         try {
@@ -64,9 +81,10 @@ public class JuHeServiceImpl implements JuHeService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        if(juHeCheckLoginResponse.getCode() != 200){
-            throw new RuntimeException("登录失败");
+        if (juHeCheckLoginResponse.getCode() != 200) {
+            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?message='登录失败'" );
         }
+        redisUtil.delete(userUid);
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, juHeCheckLoginResponse.getSocial_uid()));
         if (ObjectUtils.isEmpty(user)) {
             // 保存账号信息
@@ -78,7 +96,7 @@ public class JuHeServiceImpl implements JuHeService {
                     .ipLocation(juHeCheckLoginResponse.getLocation())
                     .ip(juHeCheckLoginResponse.getIp())
                     .status(Constants.YES)
-                    .nickname(juHeCheckLoginResponse.getType() + "-" +getRandomString(6))
+                    .nickname(juHeCheckLoginResponse.getNickname())
                     .avatar(juHeCheckLoginResponse.getFaceimg())
                     .build();
             userMapper.insert(user);
@@ -87,41 +105,9 @@ public class JuHeServiceImpl implements JuHeService {
         }
         // 登录
         StpUtil.login(user.getId());
-        LoginUserInfo loginUserInfo = BeanUtil.copyProperties(user, LoginUserInfo.class);
-        loginUserInfo.setToken(StpUtil.getTokenValue());
-        return loginUserInfo;
+        httpServletResponse.sendRedirect(frontProperties.getUrl() + "?token=" + StpUtil.getTokenValue());
     }
 
-    private static String getLoginType(Integer type) {
-     switch ( type) {
-         case 1:
-             return "QQ";
-         case 2:
-             return "微信";
-         case 3:
-             return "支付宝";
-         case 4:
-             return "微博";
-         case 5:
-             return "百度";
-         case 6:
-             return "华为";
-         case 7:
-             return "小米";
-         case 8:
-             return "微软";
-         case 9:
-             return "钉钉";
-         case 10:
-             return "Gitee";
-         case 11:
-             return "GitHub";
-         case 12:
-             return "抖音";
-         default:
-             return "未知";
-     }
-    }
     public static String getRandomString(int length) {
         String str = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
         Random random = new Random();
