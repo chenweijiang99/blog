@@ -72,6 +72,7 @@ export default {
       if (flag) {
         let token = window.location.href.split("token=")[1];
         this.$store.commit('SET_TOKEN', token);
+        this.$message.success("登录成功");
       }
     },
 

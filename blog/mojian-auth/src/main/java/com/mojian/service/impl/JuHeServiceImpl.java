@@ -65,9 +65,16 @@ public class JuHeServiceImpl implements JuHeService {
 
     @Override
     public void checkJuHeLogin(String userUid, HttpServletResponse httpServletResponse) throws IOException {
+        if(!redisUtil.hasKey(userUid)){
+            String errorMessage = java.net.URLEncoder.encode("登录过期", "UTF-8");
+            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?code=400&message=" + errorMessage);
+            return;
+        }
         String cxid = redisUtil.get(userUid).toString();
-        if (ObjectUtils.isEmpty(cxid)) {
-            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?message='登录过期'" );
+        if(cxid == null || cxid.isEmpty()){
+            String errorMessage = java.net.URLEncoder.encode("登录过期", "UTF-8");
+            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?code=400&message=" + errorMessage);
+            return;
         }
         String checkUrl = juHeLoginConfigProperties.getCheckLoginUrl()
                 + "?id=" + juHeLoginConfigProperties.getId()
@@ -82,7 +89,9 @@ public class JuHeServiceImpl implements JuHeService {
             throw new RuntimeException(e);
         }
         if (juHeCheckLoginResponse.getCode() != 200) {
-            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?message='登录失败'" );
+            String errorMessage = java.net.URLEncoder.encode("登录失败，"+juHeCheckLoginResponse.getMsg(), "UTF-8");
+            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?code=400&message=" + errorMessage);
+            return;
         }
         redisUtil.delete(userUid);
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, juHeCheckLoginResponse.getSocial_uid()));

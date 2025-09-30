@@ -19,12 +19,12 @@
 
           <el-form :model="loginForm" :rules="rules" ref="ruleFrom">
             <el-form-item class="form-item" prop="username">
-              <el-input prefix-icon="el-icon-user-solid" v-model="loginForm.username" placeholder="请输入邮箱"
+              <el-input prefix-icon="el-icon-user-solid" v-model="loginForm.username" placeholder="  请输入邮箱"
                 @keyup.enter.native="handleLogin" size="large" />
             </el-form-item>
 
             <el-form-item class="form-item" prop="password">
-              <el-input prefix-icon="el-icon-lock" v-model="loginForm.password" placeholder="请输入密码"
+              <el-input prefix-icon="el-icon-lock" v-model="loginForm.password" placeholder="  请输入密码"
                 @keyup.enter.native="handleLogin" show-password size="large" />
             </el-form-item>
 
@@ -69,16 +69,16 @@
             <p class="form-subtitle">欢迎注册,请输入您的账号</p>
           </div>
           <el-form :model="registerForm" :rules="rules" ref="registerForm">
-            <el-form-item lable="昵称" prop="nickname">
-              <el-input prefix-icon="el-icon-user-solid" v-model="registerForm.nickname" placeholder="请输入昵称" />
+            <el-form-item  class="form-item" prop="nickname">
+              <el-input prefix-icon="el-icon-user" v-model="registerForm.nickname" placeholder="  请输入昵称" />
             </el-form-item>
 
             <el-form-item class="form-item" prop="email">
-              <el-input prefix-icon="el-icon-message" v-model="registerForm.email" placeholder="请输入邮箱" />
+              <el-input prefix-icon="el-icon-message" v-model="registerForm.email" placeholder="  请输入邮箱" />
             </el-form-item>
 
             <el-form-item class="form-item" prop="code">
-              <el-input prefix-icon="el-icon-key" v-model="registerForm.code" placeholder="请输入验证码">
+              <el-input prefix-icon="el-icon-key" v-model="registerForm.code" placeholder="  请输入验证码">
                 <template slot="append">
                   <el-button @click="sendRegisterCode" :disabled="codeSending">
                     {{ codeButtonText }}
@@ -88,7 +88,7 @@
             </el-form-item>
 
             <el-form-item class="form-item" prop="password">
-              <el-input prefix-icon="el-icon-lock" v-model="registerForm.password" placeholder="请输入密码" show-password />
+              <el-input prefix-icon="el-icon-lock" v-model="registerForm.password" placeholder="  请输入密码" show-password />
             </el-form-item>
 
             <el-form-item class="form-item">
@@ -111,11 +111,11 @@
           </div>
           <el-form :model="forgotForm" :rules="rules" ref="forgotForm">
             <el-form-item class="form-item" prop="email">
-              <el-input prefix-icon="el-icon-message" v-model="forgotForm.email" placeholder="请输入注册邮箱" />
+              <el-input prefix-icon="el-icon-message" v-model="forgotForm.email" placeholder="  请输入注册邮箱" />
             </el-form-item>
 
             <el-form-item class="form-item" prop="code">
-              <el-input prefix-icon="el-icon-key" v-model="forgotForm.code" placeholder="请输入验证码">
+              <el-input prefix-icon="el-icon-key" v-model="forgotForm.code" placeholder="  请输入验证码">
                 <template slot="append">
                   <el-button @click="sendVerificationCode" :disabled="codeSending">
                     {{ codeButtonText }}
@@ -125,7 +125,7 @@
             </el-form-item>
 
             <el-form-item class="form-item" prop="password">
-              <el-input prefix-icon="el-icon-lock" v-model="forgotForm.password" placeholder="请输入新密码" show-password />
+              <el-input prefix-icon="el-icon-lock" v-model="forgotForm.password" placeholder="  请输入新密码" show-password />
             </el-form-item>
 
             <el-form-item class="form-item">
@@ -166,6 +166,7 @@ export default {
   },
   data() {
     return {
+      rememberMe: false,
       currentForm: "login",
       cxid: "",
       loading: false,
@@ -196,7 +197,7 @@ export default {
           icon: "qq",
           type: 1,
         },
-        wechat: {
+        wx: {
           title: "微信扫码登录",
           icon: "weichat",
           type: 2,
@@ -206,7 +207,7 @@ export default {
           icon: "alipay",
           type: 3,
         },
-        weibo: {
+        sina: {
           title: "微博账号登录",
           icon: "weibo",
           type: 4,
@@ -226,7 +227,7 @@ export default {
           icon: "xiaomi",
           type: 7,
         },
-        weiruan: {
+        microsoft: {
           title: "微软账号登录",
           icon: "weiruan",
           type: 8,
@@ -494,15 +495,16 @@ export default {
     enableScroll();
     this.clearTimer();
   },
-  watch: {
-    '$route'(to) {
-      const message = to.query.message;
-      if (message) {
-        this.$message.error(message);
-      }
-    },
-
-  },
+mounted() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const message = urlParams.get('message');
+    if(code == 200 && message){
+      this.$message.success(message)
+    }else if(message){
+      this.$message.error(message)
+    }
+  }
 };
 </script>
 <style scoped lang="scss">
