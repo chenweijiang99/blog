@@ -43,6 +43,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       open: false,
       proxy: {
         '/api': {
+          secure:true,
           target: env.VITE_APP_API_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
