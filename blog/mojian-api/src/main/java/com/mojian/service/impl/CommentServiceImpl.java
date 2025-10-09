@@ -13,12 +13,14 @@ import com.mojian.mapper.SysCommentMapper;
 import com.mojian.utils.IpUtil;
 import com.mojian.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentServiceImpl implements CommentService {
 
     private final SysCommentMapper sysCommentMapper;
@@ -27,6 +29,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public IPage<CommentListVo> getComments(Integer articleId,String sortType) {
+        log.info("获取评论列表, articleId: {}, sortType: {}", articleId, sortType);
         IPage<CommentListVo> page = sysCommentMapper.getComments(PageUtil.getPage(),articleId,sortType);
         //获取所有子评论
         page.getRecords().forEach(commentListVo -> {

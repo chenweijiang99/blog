@@ -28,7 +28,7 @@ public class CommentController {
 
     @SaCheckLogin
     @PostMapping("/add")
-    @ApiOperation(value = "获取文章评论列表")
+    @ApiOperation(value = "新增评论")
     public Result<Void> add(@RequestBody SysComment sysComment) {
         commentService.add(sysComment);
         return Result.success();

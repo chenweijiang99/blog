@@ -16,6 +16,7 @@ import com.mojian.mapper.SysChatMsgMapper;
 import com.mojian.service.ChatService;
 import com.mojian.websocket.WebSocketServer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatServiceImpl implements ChatService {
 
     private final WebSocketServer webSocketServer;
@@ -38,13 +40,14 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public IPage<ChatSendMsgVo> getChatMsgList() {
+        log.info("获取聊天消息列表");
         return chatMsgMapper.getChatMsgList(PageUtil.getPage());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void sendMsg(ChatSendMsgVo chatSendMsgVo) {
-
+        log.info("发送聊天消息, {}", chatSendMsgVo);
         //如果是文字类型的，就先敏感词过滤
         if (ChatTypeEnum.TEXT.getType().equals(chatSendMsgVo.getType())){
             chatSendMsgVo.setContent(SensitiveUtil.filter(chatSendMsgVo.getContent()));
@@ -92,6 +95,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void recallMsg(ChatSendMsgVo chatSendMsgVo) {
+        log.info("撤回聊天消息, {}", chatSendMsgVo);
         ChatMsg chatMsg1 = chatMsgMapper.selectById(chatSendMsgVo.getId());
         //判断发送的时间是否超过当前时间俩分钟 LocalDateTime类型
         if (chatMsg1.getCreateTime().plusMinutes(2).isBefore(LocalDateTime.now())) {

@@ -21,6 +21,7 @@ import com.mojian.mapper.SysArticleMapper;
 import com.mojian.mapper.SysCategoryMapper;
 import com.mojian.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
     private final SysArticleMapper sysArticleMapper;
@@ -43,11 +45,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public IPage<ArticleListVo> getArticleList(Integer tagId, Integer categoryId, String keyword) {
+        log.info("获取文章列表,tagId: {}, categoryId: {}, keyword: {}", tagId, categoryId, keyword);
         return sysArticleMapper.getArticleListApi(PageUtil.getPage(), tagId, categoryId, keyword);
     }
 
     @Override
     public ArticleDetailVo getArticleDetail(Long id) {
+        log.info("获取文章详情,id: {}", id);
         ArticleDetailVo detailVo = sysArticleMapper.getArticleDetail(id);
         // 判断是否点赞
         Object userId = StpUtil.getLoginIdDefaultNull();
@@ -76,7 +80,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArchiveListVo> getArticleArchive() {
-
+        log.info("获取文章归档");
         List<ArchiveListVo> list = new ArrayList<>();
 
         List<Integer> years = sysArticleMapper.getArticleArchive();
@@ -89,21 +93,25 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<CategoryListVo> getArticleCategories() {
+        log.info("获取文章分类");
         return sysCategoryMapper.getArticleCategories();
     }
 
     @Override
     public List<ArticleListVo> getCarouselArticle() {
+        log.info("获取轮播文章");
         return getArticlesByCondition(SysArticle::getIsCarousel);
     }
 
     @Override
     public List<ArticleListVo> getRecommendArticle() {
+        log.info("获取推荐文章");
         return getArticlesByCondition(SysArticle::getIsRecommend);
     }
 
     @Override
     public Boolean like(Long articleId) {
+        log.info("点赞文章,articleId: {}", articleId);
         // 判断是否点赞
         int userId = StpUtil.getLoginIdAsInt();
         Boolean isLike = sysArticleMapper.getUserIsLike(articleId, userId);
@@ -113,22 +121,28 @@ public class ArticleServiceImpl implements ArticleService {
         } else {
             sysArticleMapper.like(articleId, userId);
             ThreadUtil.execAsync(() -> {
-                //发送通知事件
-                SysNotifications notifications = SysNotifications.builder()
-                        .title("文章点赞通知")
-                        .articleId(articleId)
-                        .isRead(0)
-                        .type("like")
-                        .fromUserId(StpUtil.getLoginIdAsLong())
-                        .build();
-                notificationsUtil.publish(notifications);
+                try {
+                    SysNotifications notifications = SysNotifications.builder()
+                            .title("文章点赞通知")
+                            .articleId(articleId)
+                            .isRead(0)
+                            .type("like")
+                            .fromUserId((long) userId)
+                            .build();
+                    notificationsUtil.publish(notifications);
+                }catch (Exception e){
+                    log.error("点赞文章发送通知失败", e);
+                }
+
             });
+
         }
         return true;
     }
 
     @Override
     public List<SysCategory> getCategoryAll() {
+        log.info("获取所有分类");
         return sysCategoryMapper.selectList(new LambdaQueryWrapper<SysCategory>()
                 .orderByAsc(SysCategory::getSort));
     }
