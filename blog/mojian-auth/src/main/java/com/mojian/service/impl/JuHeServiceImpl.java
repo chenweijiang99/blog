@@ -42,61 +42,95 @@ public class JuHeServiceImpl implements JuHeService {
     private final RedisUtil redisUtil;
     private final JuHeLoginConfigProperties juHeLoginConfigProperties;
     private final FrontProperties frontProperties;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final String LOGIN_EXPIRED_MESSAGE = "登录过期";
+    private static final String LOGIN_FAILED_PREFIX = "登录失败，";
+    private static final String REDIRECT_LOGIN_URL_FORMAT = "%slogin?code=400&message=%s";
+    private static final String REDIRECT_HOME_URL_FORMAT = "%s?token=%s";
+
+    /**
+     * 获取聚合登录链接
+     * @param type 登录类型，1：微信，2：QQ，3：微博
+     */
     @Override
     public JuHeLoginResponse getJuHeAuth(Integer type) {
-        String userUid = IpUtil.getIp() + "_" + type + "_" + UUID.randomUUID();
+        log.info("开始聚合登录，type：{}", type);
+        String userUid = IpUtil.getIp() + "_" + type + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID();
         String apiUrl = juHeLoginConfigProperties.getLoginUrl()
                 + "?id=" + juHeLoginConfigProperties.getId()
                 + "&key=" + juHeLoginConfigProperties.getKey()
-                + "&return=" + juHeLoginConfigProperties.getReturnUrl()+ userUid
+                + "&return=" + juHeLoginConfigProperties.getReturnUrl() + userUid
                 + "&type=" + type;
         String result = HttpUtil.get(apiUrl);
-        ObjectMapper  objectMapper = new ObjectMapper();
-        new JuHeLoginResponse();
         JuHeLoginResponse juHeLoginResponse;
         try {
             juHeLoginResponse = objectMapper.readValue(result, JuHeLoginResponse.class);
+            if(juHeLoginResponse.getCode() != 200){
+                throw new RuntimeException("聚合登录获取登录链接失败，code：" + juHeLoginResponse.getCode() + "，msg：" + juHeLoginResponse.getMsg());
+            }
             redisUtil.set(userUid, juHeLoginResponse.getCxid(), RedisConstants.FIVE_MINUTES_EXPIRE, TimeUnit.MINUTES);
+            log.info("聚合登录获取登录链接成功，userUid：{}，cxid：{}，logurl：{}", userUid, juHeLoginResponse.getCxid(), juHeLoginResponse.getLogurl());
         } catch (JsonProcessingException e) {
+            log.error("JSON解析失败: {}", result, e);
             throw new RuntimeException(e);
         }
         return juHeLoginResponse;
     }
 
+    /**
+     * 检查聚合登录是否成功，成功则登录并重定向到首页，失败则重定向到登录页携带失败信息
+     * @param userUid 用户uid
+     * @param httpServletResponse 响应
+     * @throws IOException 异常
+     */
     @Override
     public void checkJuHeLogin(String userUid, HttpServletResponse httpServletResponse) throws IOException {
-        if(!redisUtil.hasKey(userUid)){
-            String errorMessage = java.net.URLEncoder.encode("登录过期", "UTF-8");
-            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?code=400&message=" + errorMessage);
+        log.info("开始聚合登录验证，userUid：{}", userUid);
+        // 判断是否已过期
+        if (!redisUtil.hasKey(userUid)) {
+            redirectToLogin(httpServletResponse, LOGIN_EXPIRED_MESSAGE);
             return;
         }
-        String cxid = redisUtil.get(userUid).toString();
-        if(cxid == null || cxid.isEmpty()){
-            String errorMessage = java.net.URLEncoder.encode("登录过期", "UTF-8");
-            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?code=400&message=" + errorMessage);
+        // 获取cxid
+        String cxid;
+        try {
+            Object cxidObj = redisUtil.get(userUid);
+            if (cxidObj == null) {
+                redirectToLogin(httpServletResponse, LOGIN_EXPIRED_MESSAGE);
+                return;
+            }
+            cxid = cxidObj.toString();
+        } catch (Exception e) {
+            log.error("Redis 获取 cxid 异常", e);
+            redirectToLogin(httpServletResponse, LOGIN_EXPIRED_MESSAGE);
             return;
         }
+        // 判断cxid是否为空
+        if (cxid.isEmpty()) {
+            redirectToLogin(httpServletResponse, LOGIN_EXPIRED_MESSAGE);
+            return;
+        }
+
         String checkUrl = juHeLoginConfigProperties.getCheckLoginUrl()
                 + "?id=" + juHeLoginConfigProperties.getId()
                 + "&key=" + juHeLoginConfigProperties.getKey()
                 + "&cxid=" + cxid;
         String result = HttpUtil.get(checkUrl);
-        ObjectMapper  objectMapper = new ObjectMapper();
         JuHeCheckLoginResponse juHeCheckLoginResponse;
         try {
             juHeCheckLoginResponse = objectMapper.readValue(result, JuHeCheckLoginResponse.class);
         } catch (JsonProcessingException e) {
+            log.error("JSON解析失败: {}", result, e);
             throw new RuntimeException(e);
         }
         if (juHeCheckLoginResponse.getCode() != 200) {
-            String errorMessage = java.net.URLEncoder.encode("登录失败，"+juHeCheckLoginResponse.getMsg(), "UTF-8");
-            httpServletResponse.sendRedirect(frontProperties.getUrl() +"login?code=400&message=" + errorMessage);
+            redirectToLogin(httpServletResponse, LOGIN_FAILED_PREFIX + juHeCheckLoginResponse.getMsg());
             return;
         }
         redisUtil.delete(userUid);
         SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, juHeCheckLoginResponse.getSocial_uid()));
         if (ObjectUtils.isEmpty(user)) {
-            // 保存账号信息
             user = SysUser.builder()
                     .username(juHeCheckLoginResponse.getSocial_uid())
                     .password(UUID.randomUUID().toString())
@@ -109,30 +143,35 @@ public class JuHeServiceImpl implements JuHeService {
                     .avatar(juHeCheckLoginResponse.getFaceimg())
                     .build();
             userMapper.insert(user);
-            //添加角色s
             insertRole(user);
         }
-        // 登录
+
         StpUtil.login(user.getId());
-        httpServletResponse.sendRedirect(frontProperties.getUrl() + "?token=" + StpUtil.getTokenValue());
+        log.info("聚合登录验证成功，重定向到前端首页，token：{}", StpUtil.getTokenValue());
+        httpServletResponse.sendRedirect(String.format(REDIRECT_HOME_URL_FORMAT, frontProperties.getUrl(), StpUtil.getTokenValue()));
     }
 
-    public static String getRandomString(int length) {
-        String str = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789";
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            int number = random.nextInt(str.length());
-            sb.append(str.charAt(number));
-        }
-        return sb.toString();
+    /**
+     * 重定向到登录页，携带登录失败信息
+     * @param response 响应
+     * @param message 失败信息
+     * @throws IOException 异常
+     */
+    private void redirectToLogin(HttpServletResponse response, String message) throws IOException {
+        String encodedMessage = java.net.URLEncoder.encode(message, "UTF-8");
+        response.sendRedirect(String.format(REDIRECT_LOGIN_URL_FORMAT, frontProperties.getUrl(), encodedMessage));
     }
+
     /**
      * 添加用户角色信息
-     * @param user
+     * @param user  用户
      */
     private void insertRole(SysUser user) {
         SysRole sysRole = sysRoleMapper.selectOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getCode, Constants.USER));
-        sysRoleMapper.addRoleUser(user.getId(), Collections.singletonList(sysRole.getId()));
+        if (sysRole != null) {
+            sysRoleMapper.addRoleUser(user.getId(), Collections.singletonList(sysRole.getId()));
+        } else {
+            log.warn("未找到角色 code 为 {} 的角色", Constants.USER);
+        }
     }
 }

@@ -93,6 +93,8 @@ juhe:
   key: 86b9b28af476d230a39d3acb574c01eb
   login-url: https://cn.apihz.cn/api/user/jhdl.php
   check-login-url: https://cn.apihz.cn/api/user/jhdlq.php
-  return-url: https://blog-server.wcgmallcwj.online/api/juhe/checkLogin/
+#  return-url: https://blog-server.wcgmallcwj.online/api/juhe/checkLogin/
+  return-url: http://localhost:8800/api/juhe/checkLogin/
 front:
-  url: https://blog-web.wcgmallcwj.online/
+#  url: https://blog-web.wcgmallcwj.online/
+  url: http://localhost:3000/
