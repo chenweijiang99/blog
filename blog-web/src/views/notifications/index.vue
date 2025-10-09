@@ -63,7 +63,7 @@
                 </span>
 
                 <span v-if="notification.type === 'like'">
-                  {{ notification.toNickname }} 点赞了你的 
+                  {{ notification.fromNickname }} 点赞了你的 
                   <span class="article-title" @click="handleArticleClick(notification.articleId)">{{ notification.articleTitle }}</span>
                   文章
                 </span>
