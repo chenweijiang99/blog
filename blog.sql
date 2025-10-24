@@ -76,9 +76,9 @@ CREATE TABLE IF NOT EXISTS `file_detail` (
 
 -- 正在导出表  blog.file_detail 的数据：~3 rows (大约)
 INSERT INTO `file_detail` (`id`, `url`, `size`, `filename`, `original_filename`, `base_path`, `path`, `ext`, `content_type`, `platform`, `th_url`, `th_filename`, `th_size`, `th_content_type`, `object_id`, `object_type`, `metadata`, `user_metadata`, `th_metadata`, `th_user_metadata`, `attr`, `file_acl`, `th_file_acl`, `hash_info`, `upload_id`, `upload_status`, `source`, `create_time`) VALUES
-	('5cfca5202a36cad42457942caed926d7', 'http://117.72.179.87:85/localFile/20250806/default/43_pexels-armagan-basaran-107016502-9951800.jpg', 42760, '43_pexels-armagan-basaran-107016502-9951800.jpg', 'pexels-armagan-basaran-107016502-9951800.jpg', '', '20250806/default/', 'jpg', 'image/jpeg', 'local', NULL, NULL, NULL, NULL, NULL, NULL, '{}', '{}', '{}', '{}', '{"source":"default"}', NULL, NULL, '{}', NULL, NULL, 'default', '2025-08-06 15:48:21'),
-	('665bafd71e7a70433cf27867139837fc', 'http://117.72.179.87:85/localFile/20250806/default/78_favicon.jpg', 1163, '78_favicon.jpg', 'favicon.jpg', '', '20250806/default/', 'jpg', 'image/jpeg', 'local', NULL, NULL, NULL, NULL, NULL, NULL, '{}', '{}', '{}', '{}', '{"source":"default"}', NULL, NULL, '{}', NULL, NULL, 'default', '2025-08-06 16:11:08'),
-	('d0562b7cd0ea87afd7273ec5f9e60f0b', 'http://117.72.179.87:85/localFile/20250806/default/70_11655583_cwj991203_1737426835.png', 15660, '70_11655583_cwj991203_1737426835.png', '11655583_cwj991203_1737426835.png', '', '20250806/default/', 'png', 'image/png', 'local', NULL, NULL, NULL, NULL, NULL, NULL, '{}', '{}', '{}', '{}', '{"source":"default"}', NULL, NULL, '{}', NULL, NULL, 'default', '2025-08-06 15:45:54');
+	('5cfca5202a36cad42457942caed926d7', 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/43_pexels-armagan-basaran-107016502-9951800.jpg', 42760, '43_pexels-armagan-basaran-107016502-9951800.jpg', 'pexels-armagan-basaran-107016502-9951800.jpg', '', '20250806/default/', 'jpg', 'image/jpeg', 'local', NULL, NULL, NULL, NULL, NULL, NULL, '{}', '{}', '{}', '{}', '{"source":"default"}', NULL, NULL, '{}', NULL, NULL, 'default', '2025-08-06 15:48:21'),
+	('665bafd71e7a70433cf27867139837fc', 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/78_favicon.jpg', 1163, '78_favicon.jpg', 'favicon.jpg', '', '20250806/default/', 'jpg', 'image/jpeg', 'local', NULL, NULL, NULL, NULL, NULL, NULL, '{}', '{}', '{}', '{}', '{"source":"default"}', NULL, NULL, '{}', NULL, NULL, 'default', '2025-08-06 16:11:08'),
+	('d0562b7cd0ea87afd7273ec5f9e60f0b', 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/70_11655583_cwj991203_1737426835.png', 15660, '70_11655583_cwj991203_1737426835.png', '11655583_cwj991203_1737426835.png', '', '20250806/default/', 'png', 'image/png', 'local', NULL, NULL, NULL, NULL, NULL, NULL, '{}', '{}', '{}', '{}', '{"source":"default"}', NULL, NULL, '{}', NULL, NULL, 'default', '2025-08-06 15:45:54');
 
 -- 导出  表 blog.file_part_detail 结构
 CREATE TABLE IF NOT EXISTS `file_part_detail` (
@@ -492,7 +492,7 @@ CREATE TABLE IF NOT EXISTS `sys_file_oss` (
 
 -- 正在导出表  blog.sys_file_oss 的数据：~0 rows (大约)
 INSERT INTO `sys_file_oss` (`id`, `domain`, `access_key`, `secret_key`, `bucket`, `base_path`, `platform`, `is_enable`, `storage_path`, `enable_access`, `path_patterns`, `region`, `create_time`) VALUES
-	(1, 'http://117.72.179.87:85/localFile/', '', '', '', '', 'local', 1, '/app/blog/localFile/', 1, 'localFile/**', NULL, '2025-02-14 10:52:33');
+	(1, 'https://blog-web.wcgmallcwj.online/localFile/', '', '', '', '', 'local', 1, '/app/blog/localFile/', 1, 'localFile/**', NULL, '2025-02-14 10:52:33');
 
 -- 导出  表 blog.sys_friend 结构
 CREATE TABLE IF NOT EXISTS `sys_friend` (
@@ -944,7 +944,7 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
 
 -- 正在导出表  blog.sys_user 的数据：~2 rows (大约)
 INSERT INTO `sys_user` (`id`, `username`, `password`, `create_time`, `update_time`, `status`, `ip`, `ip_location`, `os`, `last_login_time`, `browser`, `nickname`, `avatar`, `mobile`, `email`, `sex`, `login_type`, `signature`) VALUES
-	(1, 'admin', '$2a$10$GSHv.XwqBkizplz5j2pcmu73IRY2rgtxCYQwAvSXMvu9SryzydLpe', '2024-12-27 14:16:17', '2025-08-06 15:51:52', 1, '127.0.0.1', '内网IP|内网IP', 'Windows', '2025-08-06 17:07:49', 'Chrome', '韋', 'http://117.72.179.87:85/localFile/20250806/default/70_11655583_cwj991203_1737426835.png', '', '1774532899@qq.com', 1, 'email', NULL),
+	(1, 'admin', '$2a$10$GSHv.XwqBkizplz5j2pcmu73IRY2rgtxCYQwAvSXMvu9SryzydLpe', '2024-12-27 14:16:17', '2025-08-06 15:51:52', 1, '127.0.0.1', '内网IP|内网IP', 'Windows', '2025-08-06 17:07:49', 'Chrome', '韋', 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/70_11655583_cwj991203_1737426835.png', '', '1774532899@qq.com', 1, 'email', NULL),
 	(1811, '1774532899@qq.com', '$2a$10$pJaFt6dj71Q3QU0yTQX6rOgVQfxw4lRtqZKsE2uLANHi//Pki7rMW', '2025-08-06 16:10:07', '2025-08-06 16:09:57', 1, '222.182.57.127', '中国|重庆|重庆市|电信', 'Windows', '2025-08-06 17:04:41', 'Chrome', 'cwj', 'https://api.dicebear.com/6.x/pixel-art/svg?seed=Kitty', NULL, '1774532899@qq.com', NULL, NULL, NULL);
 
 -- 导出  表 blog.sys_user_role 结构
@@ -996,7 +996,7 @@ CREATE TABLE IF NOT EXISTS `sys_web_config` (
 
 -- 正在导出表  blog.sys_web_config 的数据：~1 rows (大约)
 INSERT INTO `sys_web_config` (`id`, `logo`, `name`, `summary`, `record_num`, `web_url`, `author`, `author_info`, `author_avatar`, `ali_pay`, `weixin_pay`, `github`, `gitee`, `qq_number`, `qq_group`, `email`, `wechat`, `show_list`, `login_type_list`, `open_comment`, `open_admiration`, `tourist_avatar`, `bulletin`, `about_me`, `create_time`, `update_time`, `open_lantern`) VALUES
-	(1, 'http://117.72.179.87:85/localFile/20250806/default/78_favicon.jpg', '韋博客', '一个专注于技术分享的博客平台', '1', 'https://www.shiyit.com', '韋', '十八岁以后我的梦想变成了买房买车。', 'http://117.72.179.87:85/localFile/20250806/default/70_11655583_cwj991203_1737426835.png', NULL, NULL, '', 'https://gitee.com/CWJ991203', '1774532899', '', '1774532899@qq.com', '18223354992', '["qq","wechat","gitee","qqGroup","github","email"]', '[]', 1, 1, 'http://117.72.179.87:85/localFile/20250806/default/43_pexels-armagan-basaran-107016502-9951800.jpg', '有没有在长沙内推的小伙伴，卑微博主在线求职了，有的话<span style="color:red">VX：1248954763</span> 联系博主', '<p><br></p>', '2024-12-22 11:55:25', '2024-12-22 11:55:25', 0);
+	(1, 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/78_favicon.jpg', '韋博客', '一个专注于技术分享的博客平台', '1', 'https://www.shiyit.com', '韋', '十八岁以后我的梦想变成了买房买车。', 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/70_11655583_cwj991203_1737426835.png', NULL, NULL, '', 'https://gitee.com/CWJ991203', '1774532899', '', '1774532899@qq.com', '18223354992', '["qq","wechat","gitee","qqGroup","github","email"]', '[]', 1, 1, 'https://blog-web.wcgmallcwj.online/localFile/20250806/default/43_pexels-armagan-basaran-107016502-9951800.jpg', '有没有在长沙内推的小伙伴，卑微博主在线求职了，有的话<span style="color:red">VX：1248954763</span> 联系博主', '<p><br></p>', '2024-12-22 11:55:25', '2024-12-22 11:55:25', 0);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
