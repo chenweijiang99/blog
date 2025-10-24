@@ -1,28 +1,13 @@
 ## 博客介绍
 根据开源博客  [拾壹博客](https://gitee.com/quequnlong/shiyi-blog) 进行了部分修改
 
-<p align="center">
-   <a target="_blank" href="https://github.com/X1192176811/blog">
-      <img src="https://img.shields.io/hexpm/l/plug.svg"/>
-      <img src="https://img.shields.io/badge/JDK-1.8+-green.svg"/>
-      <img src="https://img.shields.io/badge/springboot-2.4.1.RELEASE-green"/>
-      <img src="https://img.shields.io/badge/vue-2.5.17-green"/>
-      <img src="https://img.shields.io/badge/mysql-5.5.0-green"/>
-      <img src="https://img.shields.io/badge/mybatis--plus-3.4.0-green"/>
-      <img src="https://img.shields.io/badge/redis-6.0.5-green"/>
-      <img src="https://img.shields.io/badge/elasticsearch-7.9.2-green"/>
-   </a>
-</p>
-
-[在线地址](#在线地址) | [目录结构](#目录结构) | [项目特点](#项目特点) | [技术介绍](#技术介绍) | [运行环境](#运行环境)
-
 
 ## 在线地址
 
-**项目链接：** [韋博客](http://blog-web.wcgmallcwj.online/)
+**项目链接：** [韋博客](https://blog-web.wcgmallcwj.online/)
 
 ## 站点演示地址
-**后台链接：** [韋博客后台管理系统](http://blog-admin.wcgmallcwj.online/login)
+**后台链接：** [韋博客后台管理系统](https://blog-admin.wcgmallcwj.online/login)
 
 账号:test 密码:123456
 
@@ -41,8 +26,6 @@ SQL文件位于根目录下的 mj-blog.sql
 可直接导入该项目于本地，修改后端配置文件中的数据库等连接信息，项目中使用到的关于七牛云功能和第三方授权登录等需要自行开通。
 
 当你克隆项目到本地后可使用账号：admin，密码：123456 进行登录
-
-本地访问接口文档地址：http://127.0.0.1:8800/shiyi/doc.html
 
 **ps：请先运行后端项目，再启动前端项目，前端项目配置由后端动态加载。**
 
@@ -76,70 +59,3 @@ blog
 - 使用websocket技术实现博客群聊功能,支持发送表情、动图、文件、语音、图片
 - 
 
-## 项目截图
-
-**门户**
-![statics/img0.png](/statics/img0.png) ![statics/img.png](/statics/img.png)
-
-
-![statics/img_1.png](/statics/img_1.png) ![statics/img_2.png](/statics/img_2.png)
-
-
-![statics/img_3.png](/statics/img_3.png) ![img.png](/statics/login.png)
-
-![img.png](/statics/about.png)
-
-**管理系统**
-![statics/img_4.png](/statics/img_4.png)  ![statics/img_5.png](/statics/img_5.png)
-
-![statics/img_6.png](/statics/img_6.png)  ![statics/img_7.png](/statics/img_7.png)
-
-![statics/img_8.png](/statics/img_8.png)  ![statics/img_9.png](/statics/img_9.png)
-
-![statics/img_10.png](/statics/img_10.png)  ![statics/img_11.png](/statics/img_11.png)
-
-![statics/img_12.png](/statics/img_12.png)  ![statics/img_13.png](/statics/img_13.png)
-
-![statics/img_14.png](/statics/img_14.png)  ![statics/img_15.png](/statics/img_15.png)
-
-![statics/img_16.png](/statics/img_16.png)  ![statics/img_17.png](/statics/img_17.png)
-
-![statics/img_18.png](/statics/img_18.png)  ![statics/img_19.png](/statics/img_19.png)
-
-![statics/img_20.png](/statics/img_20.png) ![statics/img21.png](/statics/img21.png)
-
-
-## 技术介绍
-
-**门户-前端：** vue2.0 +  Vuex + vue-router + axios + elementUi
-
-**管理系统-前端：** vue3.0 +  pinia + vue-router + axios + element-plus + echarts
-
-**后端：** SpringBoot + nginx + docker + sa-token + Swagger2 + MyBatisPlus + Mysql + Redis + elasticsearch
-
-**其他：** 接入QQ、微博、码云、微信公众号等第三方登录，接入七牛云对象存储
-
-## 运行环境
-
-**服务器：** 腾讯云2核4G CentOS7.6
-
-**对象存储：** 七牛云OSS
-
-**最低配置：** 1核2G服务器（关闭ElasticSearch）
-
-## 开发环境
-
-|            开发工具            |           说明            |
-| ----------------------------- | ------------------------- |
-| IDEA                          | Java开发工具IDE            |
-| VSCode                        | Vue开发工具IDE             |
-| Navicat                       | MySQL远程连接工具          |
-| Another Redis Desktop Manager | Redis远程连接工具          |
-| finalshell                    | Linux远程连接和文件上传工具 |
-
-|    开发环境    |  版本  |
-| ------------- | ----- |
-| JDK           | 1.8   |
-| MySQL         | 5.5.0 |
-| Redis         | 6.0.5 |
-| Elasticsearch | 7.9.2 |
