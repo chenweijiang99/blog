@@ -6,7 +6,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    url: jdbc:mysql://117.72.179.87:3306/blog?characterEncoding=UTF-8&useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&tinyInt1isBit=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/blog?characterEncoding=UTF-8&useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&tinyInt1isBit=false&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: blog
     password: 123456
@@ -41,13 +41,13 @@ knife4j:
 
 #==============================公众号配置==============================
 wechat:
-  app-id: wx66610ae6a45de497
+  app-id: 
   # 公众号AppSecret
-  secret: 9631b5c8d542556f5bc542328618015c
+  secret: 
   # 公众号Token
-  token: cwj
+  token: 
   # 公众号AES Key
-  aesKey: EsolspotIfizscSLU7NqnlYIwcYoYmzZALRMv65DcBr
+  aesKey: 
 
   appletAppId:
   appletSecret:
@@ -55,18 +55,18 @@ wechat:
 #==============================豆包推理AI配置=======================================
 ai:
   # API Key
-  apiKey: afc59328-3eb7-4414-a800-38cde2292bca
-  baseUrl: https://ark.cn-beijing.volces.com/api/v3
+  apiKey: 
+  baseUrl: 
   # 推理接入点ID
-  model: ep-20250811101710-glvvc
+  model: 
 
 #==============================邮箱配置=======================================
 mail:
   smtp:
     host: smtp.163.com
     port: 25
-    email: chenweijiang_1203@163.com
-    password: CQex8Hr8VJvVSiFD
+    email: 
+    password: 
 
 #============================第三方登录配置信息===================================
 qq:
@@ -79,13 +79,13 @@ weibo:
   redirect-url:  1111
 
 gitee:
-  app-id: 4d9b0dcb415a5bda3bf926adde953e4b9cc9316efd89ecbcd523ea4d792e99cc
-  app-secret: a73339c446e43a87970a57adcadd929b4d7d8fc3472770ded119b62cdb153b4e
+  app-id: 
+  app-secret: 
   redirect-url: https://blog-server.wcgmallcwj.online/api/auth/callback/gitee
 
 github:
-  app-id: Ov23liuq94w75TUbk1ZO
-  app-secret: e30ab9a35e0888eb9d76c04460f374d694cfe1c1
+  app-id:
+  app-secret: 
   redirect-url: https://blog-server.wcgmallcwj.online/api/auth/callback/github
 #==============================聚合登录配置信息===================================
 juhe:
