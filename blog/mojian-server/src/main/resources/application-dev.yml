@@ -89,8 +89,8 @@ github:
   redirect-url: https://blog-server.wcgmallcwj.online/api/auth/callback/github
 #==============================聚合登录配置信息===================================
 juhe:
-  id: 10008450
-  key: 86b9b28af476d230a39d3acb574c01eb
+  id: 
+  key: 
   login-url: https://cn.apihz.cn/api/user/jhdl.php
   check-login-url: https://cn.apihz.cn/api/user/jhdlq.php
   return-url: https://blog-server.wcgmallcwj.online/api/juhe/checkLogin/
